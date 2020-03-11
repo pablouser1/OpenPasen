@@ -1,6 +1,9 @@
-import requests, pickle
+import requests
 import os
 import json
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 #Initial variables
 headers = {
     "Content-Type": "application/json; charset=UTF-8"
@@ -19,69 +22,39 @@ def req(method, url):
         data = requests.post(url, headers=headers, cookies=jar)
         return data
 
-#Hacer login, conseguir cookies para iniciar sesión
-def login():
-    username = input("Enter username: ")
-    password = input("Enter password: ")
-    body = 'p={ "version":"11.9.1" }&USUARIO=' + username + '&CLAVE=' + password
-    login = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/login", headers=headerslogin, data=body)
-    if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
-        print("Error al iniciar sesión, ¿ha escrito la contraseña correcta?")
-        quit(1)
-    global jar
-    jar = requests.cookies.RequestsCookieJar()
-    jar.set('SenecaP', login.cookies['SenecaP'], domain='www.juntadeandalucia.es', path='/')
-    jar.set('JSESSIONID', login.cookies['JSESSIONID'], domain='www.juntadeandalucia.es', path='/')
-    print("Las cookies usadas son: " + str(jar))
-    mainmenu()
+class Handler:
+    def onDestroy(self, *args):
+        Gtk.main_quit()
 
+    #Botón login pulsado
+    def on_login_clicked(self, button):
+        username = builder.get_object('username').get_text()
+        password = builder.get_object('password').get_text()
+        body = 'p={ "version":"11.9.1" }&USUARIO=' + username + '&CLAVE=' + password
+        login = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/login", headers=headerslogin, data=body)
+        print(username + " " + password)
+        # Comprobando si se ha iniciado sesión correctamente
+        if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
+            print("Error al iniciar sesión, ¿ha escrito la contraseña correcta?")
+            quit(1)
+        global jar
+        jar = requests.cookies.RequestsCookieJar()
+        jar.set('SenecaP', login.cookies['SenecaP'], domain='www.juntadeandalucia.es', path='/')
+        jar.set('JSESSIONID', login.cookies['JSESSIONID'], domain='www.juntadeandalucia.es', path='/')
+        print("Las cookies usadas son: " + str(jar))
+        builder.get_object("login_menu").hide()
+        builder.get_object("main_menu").show()
 
-#Menú prinicipal
-def mainmenu():
-    main = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/infoSesion")
+    def on_main_menu_show(self, *args):
+        main = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/infoSesion")
+        print("Escribiendo datos del usuario...")
+        builder.get_object("textbuffer1").set_text("Bienvenido, " + main.json()['RESULTADO'][0]['USUARIO'])
+        #builder.get_object("bienvenido_img").
+        
 
-    os.system('clear')
-    print ("Bienvenido, " + main.json()['RESULTADO'][0]['USUARIO'])
-    print ("\t1 - Actividades evaluables")
-    print ("\t2 - segunda opción")
-    print ("\t3 - Información")
-    print ("\t9 - salir")
-    while True:
-        menuoption = input("inserta un numero valor >> ")
-        if menuoption=="1":
-            acteval()
-        elif menuoption=="2":
-            print ("")
-            input("Has pulsado la opción 2...\npulsa una tecla para continuar")
-        elif menuoption=="3":
-            info()
-        elif menuoption=="9":
-            break
-        else:
-            print ("")
-            input("No has pulsado ninguna opción correcta...\nPulsa una tecla para continuar")
+builder = Gtk.Builder()
+builder.add_from_file("login.glade")
+builder.connect_signals(Handler())
 
-def acteval():
-    os.system('clear')
-    print ("\t1 - Test")
-    print ("\t2 - Test2")
-    print ("\t3 - Test3")
-    print ("\t9 - salir")
-    while True:
-        menuoption = input("inserta un numero valor >> ")
-        if menuoption=="1":
-            acteval()
-        elif menuoption=="2":
-            print ("")
-            input("Has pulsado la opción 2...\npulsa una tecla para continuar")
-        elif menuoption=="3":
-            info()
-        elif menuoption=="9":
-            break
-        else:
-            print ("")
-            input("No has pulsado ninguna opción correcta...\npulsa una tecla para continuar")
-
-def info():
-    print("WIP")
-login()
+builder.get_object("login_menu").show()
+Gtk.main()
