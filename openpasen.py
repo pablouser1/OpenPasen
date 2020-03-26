@@ -1,7 +1,7 @@
 import requests
 import json
 import gi
-import configparser
+#import configparser TODO
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -14,6 +14,13 @@ headerslogin = {
     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
 }
 
+class userinfo:
+    # Al conseguir iniciar sesión, establecer variables, se utilizan luego
+    def __init__(self, main):
+        self.nombre = main.json()['RESULTADO'][0]['USUARIO']
+        self.matricula = main.json()['RESULTADO'][0]['MATRICULAS'][0]['X_MATRICULA']
+        self.centro = main.json()['RESULTADO'][0]['MATRICULAS'][0]['X_CENTRO']
+    
 #Facilitar las requests
 def req(method, url):
     if (method == "GET"):
@@ -23,6 +30,7 @@ def req(method, url):
         data = requests.post(url, headers=headers, cookies=jar)
         return data
 
+#GTK Handler
 class Handler:
     def onDestroy(self, *args):
        Gtk.main_quit()
@@ -33,8 +41,7 @@ class Handler:
     
     #Ventana acerca de activada
     def on_about_button_activate(self, button):
-        print(str(builder))
-        #builder = Gtk.Builder()
+        builder = Gtk.Builder()
         builder.get_object("about").show()
     
     #Botón login pulsado
@@ -59,13 +66,18 @@ class Handler:
     def on_main_menu_show(self, *args):
         main = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/infoSesion")
         print("Escribiendo datos del usuario...")
-        builder.get_object("bienvenido_buffer").set_text("Bienvenido, " + main.json()['RESULTADO'][0]['USUARIO'])
-        #builder.get_object("bienvenido_img").
-        
+        user = userinfo(main)
+        builder.get_object("bienvenido_buffer").set_text("Bienvenido, " + user.nombre)
+
+        # TODO Hacer aparecer imagen alumno
 
 builder = Gtk.Builder()
 builder.add_from_file("assets/glade/openpasen.glade")
 builder.connect_signals(Handler())
-
 builder.get_object("login_menu").show()
 Gtk.main()
+
+# TODO https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos (Avisos ventana emergente) | GET
+# TODO https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getComunicaciones (Comunicaciones profe <-> alumno) | GET
+# TODO https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias (Actividades evaluables) | POST?
+# TODO https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getNotas (NOTAS) | POST
