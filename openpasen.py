@@ -98,7 +98,6 @@ class Handler:
         global user
         user = userinfo(main)
         builder.get_object("bienvenido_buffer").set_text("Bienvenido, " + user.nombre)
-        # TODO Hacer aparecer imagen alumno
 
 # Iniciar builder y mostrar menú login
 config = configparser.ConfigParser()

@@ -11,5 +11,9 @@ Actualmente testeado usando una cuenta de PASEN de alumno.
 Queda por implementar las siguientes funciones:
 
 https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getComunicaciones (Comunicaciones profe <-> alumno) | GET?
+
 https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias (Actividades evaluables) | POST?
+
 https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getNotas (NOTAS) | POST
+
+Hacer aparecer imagen alumno (No encuentro dónde está almacenada)
