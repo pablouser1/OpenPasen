@@ -14,8 +14,6 @@ https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getComuni
 
 https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias (Actividades evaluables) | POST?
 
-https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getNotas (NOTAS) | POST
-
 Hacer aparecer imagen alumno (No encuentro dónde está almacenada)
 
 # Cómo contribuir

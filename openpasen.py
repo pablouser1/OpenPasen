@@ -28,6 +28,13 @@ class userinfo:
         self.matricula = main.json()['RESULTADO'][0]['MATRICULAS'][0]['X_MATRICULA']
         self.centro = main.json()['RESULTADO'][0]['MATRICULAS'][0]['X_CENTRO']
     
+    def convcentro_get(self, convocatorias, notas_evaluacion):
+        cantidad_convocatorias = len(convocatorias.json()['RESULTADO'])
+        for i in range(0, cantidad_convocatorias):
+            if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == notas_evaluacion):
+                self.convcentro = convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']
+
+    
 #Facilitar las requests
 def req(method, url):
     if (method == "GET"):
@@ -96,13 +103,56 @@ class Handler:
         print("EN CONSTRUCCIÓN")
         #builder.get_object("avisos").show()
         #avisos = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos")
-        #builder.get_object("avisos_label").set_markup(avisos.json()['RESULTADO'][0]['D_AVISO']) #Error, target
+        #builder.get_object("avisos_label").set_markup(avisos.json()['RESULTADO'][0]['D_AVISO']) #TODO Error
     
     def on_notas_clicked(self,button):
         builder.get_object("notas_menu").show()
 
     def on_continuar_notas_boton_clicked(self, button):
-        builder.get_object("notascombo").get_active_text()
+        # Para poder conseguir las notas, primero hay que conseguir la variable X_CONVCENTRO, la cual está en getConvocatorias
+
+        # TODO Puro spaguetti, lo limpiaré cuando tenga tiempo
+        bodyconv = "X_MATRICULA=" + user.matricula
+        convocatorias = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias", headers=headerslogin, cookies=jar, data=bodyconv)
+        notas_evaluacion = builder.get_object("notascombo").get_active_text()
+        user.convcentro_get(convocatorias, notas_evaluacion)
+
+        notas_menu = builder.get_object("notas_evaluacion_menu")
+        notas_grid = Gtk.Grid()
+        notas_menu.add(notas_grid)
+        bodynotas = "X_MATRICULA=" + user.matricula + "&X_CONVCENTRO=" + str(user.convcentro)
+        notas = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getNotas", headers=headerslogin, cookies=jar, data=bodynotas)
+        cantidad_notas = len(notas.json()['RESULTADO'])
+        label_asignatura = []
+        label_nota = []
+        for i in range(0, cantidad_notas):
+            label_asignatura.append('label_asignatura' + str(i))
+            label_asignatura[i] = Gtk.Label()
+
+            label_nota.append('label_asignatura' + str(i))
+            label_nota[i] = Gtk.Label()
+
+            if (i == 0):
+                print("Creado")
+                notas_grid.add(label_asignatura[i])
+
+                notas_grid.attach_next_to(label_nota[i], label_asignatura[i], Gtk.PositionType.RIGHT, 1, 2)
+            else:
+                notas_grid.attach_next_to(label_asignatura[i], label_asignatura[i-1], Gtk.PositionType.BOTTOM, 1, 2)
+
+                notas_grid.attach_next_to(label_nota[i], label_asignatura[i], Gtk.PositionType.RIGHT, 1, 2)
+            
+            if (notas.json()['RESULTADO'][i]['CONV'] == notas_evaluacion):
+                print("Escribiendo asignatura: " + notas.json()['RESULTADO'][i]['D_MATERIA'] + " y nota:" + notas.json()['RESULTADO'][i]['NOTA'] + " en " + str(label_asignatura[i]) + " y " + str(label_nota[i]))
+                label_asignatura[i].set_text(notas.json()['RESULTADO'][i]['D_MATERIA'])
+                label_nota[i].set_text(notas.json()['RESULTADO'][i]['NOTA'])
+
+
+            else:
+                print(notas.json()['RESULTADO'][i]['CONV'] + " y " + notas_evaluacion + " no coinciden")
+
+        
+        builder.get_object("notas_evaluacion_menu").show_all()
     #Barra de herramientas
 
     # Botón acerca de pulsado

@@ -27,7 +27,7 @@ along with .  If not, see <http://www.gnu.org/licenses/>.
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">OpenPasen</property>
-    <property name="version">1.1</property>
+    <property name="version">1.2</property>
     <property name="comments" translatable="yes">Cliente open-source hecho en Python del programa de seguimiento escolar de la Junta de Andalucía.</property>
     <property name="website">https://github.com/pablouser1/OpenPasen</property>
     <property name="artists">Mark (grade.png) icon made by Prosymbols from www.flaticon.com
@@ -362,42 +362,13 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
   </object>
   <object class="GtkWindow" id="notas_evaluacion_menu">
     <property name="can_focus">False</property>
+    <property name="destroy_with_parent">True</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
     </child>
     <child>
-      <object class="GtkGrid">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
+      <placeholder/>
     </child>
   </object>
   <object class="GtkImage" id="notas_img">
@@ -436,9 +407,9 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <items>
-              <item id="0" translatable="yes">Primera evaluación</item>
-              <item id="1" translatable="yes">Segunda evaluación</item>
-              <item id="2" translatable="yes">Tercera evaluación</item>
+              <item id="0" translatable="yes">1ª Evaluación</item>
+              <item id="1" translatable="yes">2ª Evaluación</item>
+              <item id="2" translatable="yes">3ª Evaluación</item>
             </items>
           </object>
           <packing>
