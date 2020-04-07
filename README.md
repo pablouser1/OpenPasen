@@ -4,17 +4,19 @@ Esta es una implementación open-source distribuida bajo la licencia GPLv3 del p
 
 Utiliza Python 3, Glade, y las librerías requests, configparser y GTK 3.
 
-Actualmente testeado usando una cuenta de PASEN de alumno.
+Actualmente testeado usando una cuenta de PASEN de alumno y usando el sistema operativoo GNU/Linux.
 
 # TODO
 
 Queda por implementar las siguientes funciones:
 
-https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getComunicaciones (Comunicaciones profe <-> alumno) | GET?
+https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getComunicaciones (Comunicaciones profe <-> alumno) | GET
 
-https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias (Actividades evaluables) | POST?
+https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getActividadesEvaluables (Actividades evaluables) | POST
 
-Hacer aparecer imagen alumno (No encuentro dónde está almacenada)
+https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos (Avisos) | GET
+
+Hacer aparecer imagen alumno (No encuentro dónde está ubicada)
 
 # Cómo contribuir
 

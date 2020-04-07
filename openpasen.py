@@ -5,7 +5,7 @@ import json
 import configparser
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 # Initial variables
 headers = {
@@ -28,10 +28,12 @@ class userinfo:
         self.matricula = main.json()['RESULTADO'][0]['MATRICULAS'][0]['X_MATRICULA']
         self.centro = main.json()['RESULTADO'][0]['MATRICULAS'][0]['X_CENTRO']
     
-    def convcentro_get(self, convocatorias, notas_evaluacion):
+    def convcentro_get(self, evaluacion):
+        bodyconv = "X_MATRICULA=" + user.matricula
+        convocatorias = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias", headers=headerslogin, cookies=jar, data=bodyconv)
         cantidad_convocatorias = len(convocatorias.json()['RESULTADO'])
         for i in range(0, cantidad_convocatorias):
-            if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == notas_evaluacion):
+            if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == evaluacion):
                 self.convcentro = convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']
 
     
@@ -51,9 +53,10 @@ class Handler:
     def onDestroy(self, *args):
        Gtk.main_quit()
     
+    # Muy importante, hace que al abrir y cerrar un widget, en el momento de volver a abrirlo se muestre correctamente
     def delete_event(self, widget, event):
         widget.hide()
-        return True 
+        return True
     
     # --------- Botones --------- #
     # Botón login pulsado
@@ -63,7 +66,6 @@ class Handler:
         # Comprobando si se ha iniciado sesión correctamente
         if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
             builder.get_object('login_error').show()
-            quit(1)
         global jar
         jar = requests.cookies.RequestsCookieJar()
         jar.set('SenecaP', login.cookies['SenecaP'], domain='www.juntadeandalucia.es', path='/')
@@ -97,7 +99,106 @@ class Handler:
         builder.get_object("login_error").destroy()
     
     #Main menu
+    def on_notas_clicked(self,button):
+        builder.get_object("notas_menu").show()  
+
+    def on_continuar_notas_boton_clicked(self, button):
+        # TODO Puro spaguetti, lo limpiaré cuando tenga tiempo
+        notas_evaluacion = builder.get_object("notascombo").get_active_text()
+        user.convcentro_get(notas_evaluacion) # Conseguir la convcentro desde la clase userinfo
+
+        notas_menu = builder.get_object("notas_evaluacion_menu")
+        notas_grid = builder.get_object("notas_grid")
+
+        # Muy importante, hace que el usuario pueda elegir otra evaluación en la misma sesión sin recibir los mismos resultados
+        notas_grid.destroy()
+
+        notas_menu.add(notas_grid)
+        # Requests para conseguir las notas con su body. Asignación de variables iniciales
+        # Para poder conseguir las notas, primero hay que conseguir la variable X_CONVCENTRO, la cual está en getConvocatorias
+        bodynotas = "X_MATRICULA=" + user.matricula + "&X_CONVCENTRO=" + str(user.convcentro)
+        notas = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getNotas", headers=headerslogin, cookies=jar, data=bodynotas)
+        cantidad_notas = len(notas.json()['RESULTADO'])
+        label_asignatura = []
+        label_nota = []
+        nota_media = []
+        for i in range(0, cantidad_notas):
+            label_asignatura.append('label_asignatura' + str(i))
+            label_asignatura[i] = Gtk.Label()
+
+            label_nota.append('label_asignatura' + str(i))
+            label_nota[i] = Gtk.Label()
+            
+            if (notas.json()['RESULTADO'][i]['CONV'] == notas_evaluacion):
+                if (i == 0):
+                    print("Creado")
+                    notas_grid.add(label_asignatura[i])
+                    notas_grid.attach_next_to(label_nota[i], label_asignatura[i], Gtk.PositionType.RIGHT, 1, 1)
+                else:
+                    notas_grid.attach_next_to(label_asignatura[i], label_asignatura[i-1], Gtk.PositionType.BOTTOM, 1, 1)
+                    notas_grid.attach_next_to(label_nota[i], label_asignatura[i], Gtk.PositionType.RIGHT, 1, 1)
+                
+                if (i == cantidad_notas - 1):
+                    label_nota_ultimo = label_nota[i]
+                    label_asignatura_ultimo = label_asignatura[i]
+                
+                # TODO DEPRECATED, REMPLAZAR CUANDO SEA POSIBLE
+                if (int(notas.json()['RESULTADO'][i]['NOTA']) < 5):
+                    label_nota[i].modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
+                elif (int(notas.json()['RESULTADO'][i]['NOTA']) == 5):
+                    label_nota[i].modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("orange"))
+                elif (int(notas.json()['RESULTADO'][i]['NOTA']) > 5):
+                    label_nota[i].modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
+                
+                label_asignatura[i].set_text(notas.json()['RESULTADO'][i]['D_MATERIA'])
+                label_nota[i].set_text(notas.json()['RESULTADO'][i]['NOTA'])
+                nota_media.append(int(notas.json()['RESULTADO'][i]['NOTA']))
+                print("Escribiendo asignatura (" + str(i) + "): " + notas.json()['RESULTADO'][i]['D_MATERIA'] + " y nota: " + notas.json()['RESULTADO'][i]['NOTA'] + " en " + str(label_asignatura[i]) + " y " + str(label_nota[i]))
+
+            else:
+                print(notas.json()['RESULTADO'][i]['CONV'] + " y " + notas_evaluacion + " no coinciden")
+        
+        if (label_nota == []):
+            label_notfound = Gtk.Label()
+            notas_grid.add(label_notfound)
+            label_notfound.set_text("No hay notas en esta evaluación")
+        
+        else:
+            # Detalles finales, media y aviso
+            media_final = sum(nota_media) / len(nota_media)
+            label_media_titulo = Gtk.Label()
+            label_media_num = Gtk.Label()
+            #label_advertencia_txt = Gtk.Label()
+
+            notas_grid.attach_next_to(label_media_titulo, label_asignatura_ultimo, Gtk.PositionType.BOTTOM, 1, 2)
+            notas_grid.attach_next_to(label_media_num, label_nota_ultimo, Gtk.PositionType.BOTTOM, 1, 2)
+            #notas_grid.attach_next_to(label_advertencia_txt, label_media_num, Gtk.PositionType.BOTTOM, 2, 1)
+            label_media_titulo.set_text("Tu media de esta evaluación es: ")
+
+            if (int(notas.json()['RESULTADO'][i]['NOTA']) < 5):
+                label_media_num.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
+            elif (int(notas.json()['RESULTADO'][i]['NOTA']) == 5):
+                label_media_num.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("orange"))
+            elif (int(notas.json()['RESULTADO'][i]['NOTA']) > 5):
+                label_media_num.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
+            
+            label_media_num.set_text(str(round(media_final, 2)))
+            #label_advertencia_txt.set_text(notas.json()['ESTADO']['DESCRIPCION'])
+
+            #TODO Mostrar advertencia usando las dos filas disponibles
+
+        builder.get_object("notas_evaluacion_menu").show_all()
+
+    def on_act_eval_clicked(self, button):
+        builder.get_object("actividades_eval_menu").show()
     
+    def on_continuar_acteval_boton_clicked(self,button):
+        acteval_evaluacion = builder.get_object("actevalcombo").get_active_text()
+        user.convcentro_get(acteval_evaluacion)
+
+        #acteval = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getActividadesEvaluables", headers=headerslogin, cookies=jar, data=bodynotas)
+        # TODO Continuar con las actividades evaluables
+
     # Botón avisos pulsado
     def on_avisos_boton_clicked(self, button):
         print("EN CONSTRUCCIÓN")
@@ -105,56 +206,7 @@ class Handler:
         #avisos = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos")
         #builder.get_object("avisos_label").set_markup(avisos.json()['RESULTADO'][0]['D_AVISO']) #TODO Error
     
-    def on_notas_clicked(self,button):
-        builder.get_object("notas_menu").show()
-
-    def on_continuar_notas_boton_clicked(self, button):
-        # Para poder conseguir las notas, primero hay que conseguir la variable X_CONVCENTRO, la cual está en getConvocatorias
-
-        # TODO Puro spaguetti, lo limpiaré cuando tenga tiempo
-        bodyconv = "X_MATRICULA=" + user.matricula
-        convocatorias = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias", headers=headerslogin, cookies=jar, data=bodyconv)
-        notas_evaluacion = builder.get_object("notascombo").get_active_text()
-        user.convcentro_get(convocatorias, notas_evaluacion)
-
-        notas_menu = builder.get_object("notas_evaluacion_menu")
-        notas_grid = Gtk.Grid()
-        notas_menu.add(notas_grid)
-        bodynotas = "X_MATRICULA=" + user.matricula + "&X_CONVCENTRO=" + str(user.convcentro)
-        notas = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getNotas", headers=headerslogin, cookies=jar, data=bodynotas)
-        cantidad_notas = len(notas.json()['RESULTADO'])
-        label_asignatura = []
-        label_nota = []
-        for i in range(0, cantidad_notas):
-            label_asignatura.append('label_asignatura' + str(i))
-            label_asignatura[i] = Gtk.Label()
-
-            label_nota.append('label_asignatura' + str(i))
-            label_nota[i] = Gtk.Label()
-
-            if (i == 0):
-                print("Creado")
-                notas_grid.add(label_asignatura[i])
-
-                notas_grid.attach_next_to(label_nota[i], label_asignatura[i], Gtk.PositionType.RIGHT, 1, 2)
-            else:
-                notas_grid.attach_next_to(label_asignatura[i], label_asignatura[i-1], Gtk.PositionType.BOTTOM, 1, 2)
-
-                notas_grid.attach_next_to(label_nota[i], label_asignatura[i], Gtk.PositionType.RIGHT, 1, 2)
-            
-            if (notas.json()['RESULTADO'][i]['CONV'] == notas_evaluacion):
-                print("Escribiendo asignatura: " + notas.json()['RESULTADO'][i]['D_MATERIA'] + " y nota:" + notas.json()['RESULTADO'][i]['NOTA'] + " en " + str(label_asignatura[i]) + " y " + str(label_nota[i]))
-                label_asignatura[i].set_text(notas.json()['RESULTADO'][i]['D_MATERIA'])
-                label_nota[i].set_text(notas.json()['RESULTADO'][i]['NOTA'])
-
-
-            else:
-                print(notas.json()['RESULTADO'][i]['CONV'] + " y " + notas_evaluacion + " no coinciden")
-
-        
-        builder.get_object("notas_evaluacion_menu").show_all()
-    #Barra de herramientas
-
+    #Header menú principal
     # Botón acerca de pulsado
     def on_ayuda_clicked(self, button):
         builder.get_object("about").show()
@@ -199,15 +251,16 @@ class Handler:
             body = 'p={"version":"11.9.1"}&USUARIO=' + config['Login']['Username'] + '&CLAVE=' + config['Login']['Password']
             login = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/login", headers=headerslogin, data=body)
             if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
-                print("Error al iniciar sesión, ¿tienes conexión a Internet?")
-                quit(1)
+                builder.get_object('login_error').show()
             if (config['Config']['LoginRemember'] == "Y"):
                 config['Cookies'] = {
                     'SenecaP': login.cookies['SenecaP'],
                     'JSESSIONID': login.cookies['JSESSIONID']}
                 with open('config.ini', 'w') as configfile:
                     config.write(configfile)
-                    builder.get_object('main_menu').show()
+                jar.set('SenecaP', config['Cookies']['senecap'], domain='www.juntadeandalucia.es', path='/')
+                jar.set('JSESSIONID', config['Cookies']['JSESSIONID'], domain='www.juntadeandalucia.es', path='/')
+                builder.get_object('main_menu').show_all()
 
 # Iniciar builder y mostrar menú login
 config = configparser.ConfigParser()

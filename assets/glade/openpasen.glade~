@@ -27,7 +27,7 @@ along with .  If not, see <http://www.gnu.org/licenses/>.
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">OpenPasen</property>
-    <property name="version">1.1.1</property>
+    <property name="version">1.2</property>
     <property name="comments" translatable="yes">Cliente open-source hecho en Python del programa de seguimiento escolar de la Junta de Andalucía.</property>
     <property name="website">https://github.com/pablouser1/OpenPasen</property>
     <property name="artists">Mark (grade.png) icon made by Prosymbols from www.flaticon.com
@@ -67,10 +67,8 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
     <property name="can_focus">False</property>
     <property name="pixbuf">../img/acteval.png</property>
   </object>
-  <object class="GtkWindow" id="act_eval_menu">
+  <object class="GtkWindow" id="actividades_eval_menu">
     <property name="can_focus">False</property>
-    <property name="destroy_with_parent">True</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
     </child>
@@ -79,11 +77,12 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
+        <property name="spacing">10</property>
         <child>
           <object class="GtkLabel">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Seleccione la evaluación:</property>
+            <property name="label" translatable="yes">Elige la evaluación:</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -92,10 +91,37 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
           </packing>
         </child>
         <child>
-          <placeholder/>
+          <object class="GtkComboBoxText" id="actevalcombo">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <items>
+              <item id="0">1ª Evaluación</item>
+              <item id="1">2ª Evaluación</item>
+              <item id="2">3ª Evaluación</item>
+            </items>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
         </child>
         <child>
           <placeholder/>
+        </child>
+        <child>
+          <object class="GtkButton" id="continuar_acteval_boton">
+            <property name="label" translatable="yes">Continuar</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_continuar_acteval_boton_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
         </child>
       </object>
     </child>
@@ -189,6 +215,11 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
       </object>
     </child>
   </object>
+  <object class="GtkImage" id="cerrarsesion_icon">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-disconnect</property>
+  </object>
   <object class="GtkImage" id="conductas_img">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -208,6 +239,55 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-home</property>
+  </object>
+  <object class="GtkMenu" id="header_dropdown">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkImageMenuItem" id="perfil">
+        <property name="label" translatable="yes">Mi perfil</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="image">home_icon</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_perfil_activate" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="centro">
+        <property name="label" translatable="yes">Mi centro</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="image">connect_icon</property>
+        <property name="use_stock">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="cerrarsesion">
+        <property name="label" translatable="yes">Cerrar sesión</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="image">cerrarsesion_icon</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_cerrarsesion_activate" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="separador">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="salir">
+        <property name="label">gtk-quit</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="onDestroy" swapped="no"/>
+      </object>
+    </child>
   </object>
   <object class="GtkDialog" id="login_error">
     <property name="can_focus">False</property>
@@ -368,7 +448,12 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
       <placeholder/>
     </child>
     <child>
-      <placeholder/>
+      <object class="GtkGrid" id="notas_grid">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="row_spacing">10</property>
+        <property name="column_spacing">10</property>
+      </object>
     </child>
   </object>
   <object class="GtkImage" id="notas_img">
@@ -376,6 +461,141 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
     <property name="can_focus">False</property>
     <property name="margin_right">1</property>
     <property name="pixbuf">../img/grade.png</property>
+  </object>
+  <object class="GtkWindow" id="main_menu">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">OpenPasen</property>
+    <signal name="destroy" handler="onDestroy" swapped="no"/>
+    <signal name="show" handler="on_main_menu_show" swapped="no"/>
+    <child type="titlebar">
+      <object class="GtkHeaderBar">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="title" translatable="yes">OpenPasen</property>
+        <property name="subtitle" translatable="yes">Menú principal</property>
+        <property name="show_close_button">True</property>
+        <child>
+          <object class="GtkMenuButton">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="popup">header_dropdown</property>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="stock">gtk-properties</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="ayuda">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">help_icon</property>
+            <signal name="clicked" handler="on_ayuda_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="pack_type">end</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkGrid">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="row_spacing">5</property>
+        <property name="column_spacing">10</property>
+        <child>
+          <object class="GtkImage" id="bienvenido_img">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="stock">gtk-missing-image</property>
+          </object>
+          <packing>
+            <property name="left_attach">2</property>
+            <property name="top_attach">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="notas">
+            <property name="label" translatable="yes">Notas</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">notas_img</property>
+            <signal name="clicked" handler="on_notas_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="act_eval">
+            <property name="label" translatable="yes">Actividades evaluables</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">act_eval_img</property>
+            <signal name="clicked" handler="on_act_eval_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="top_attach">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="conductas">
+            <property name="label" translatable="yes">Conductas contrarias</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">conductas_img</property>
+          </object>
+          <packing>
+            <property name="left_attach">2</property>
+            <property name="top_attach">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="avisos_boton">
+            <property name="label" translatable="yes">Avisos</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">avisos_img</property>
+            <signal name="clicked" handler="on_avisos_boton_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="bienvenido_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="justify">center</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">0</property>
+            <property name="width">2</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
   </object>
   <object class="GtkWindow" id="notas_menu">
     <property name="can_focus">False</property>
@@ -407,9 +627,9 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <items>
-              <item id="0" translatable="yes">1ª Evaluación</item>
-              <item id="1" translatable="yes">2ª Evaluación</item>
-              <item id="2" translatable="yes">3ª Evaluación</item>
+              <item id="0">1ª Evaluación</item>
+              <item id="1">2ª Evaluación</item>
+              <item id="2">3ª Evaluación</item>
             </items>
           </object>
           <packing>
@@ -533,178 +753,6 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
             <property name="left_attach">1</property>
             <property name="top_attach">3</property>
           </packing>
-        </child>
-      </object>
-    </child>
-  </object>
-  <object class="GtkImage" id="quit_icon">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-quit</property>
-  </object>
-  <object class="GtkMenu" id="header_dropdown">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <child>
-      <object class="GtkImageMenuItem" id="perfil">
-        <property name="label" translatable="yes">Mi perfil</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="image">home_icon</property>
-        <property name="use_stock">False</property>
-        <signal name="activate" handler="on_perfil_activate" swapped="no"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkImageMenuItem" id="centro">
-        <property name="label" translatable="yes">Mi centro</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="image">connect_icon</property>
-        <property name="use_stock">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkImageMenuItem" id="cerrarsesion">
-        <property name="label" translatable="yes">Cerrar sesión</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="image">quit_icon</property>
-        <property name="use_stock">False</property>
-        <signal name="activate" handler="on_cerrarsesion_activate" swapped="no"/>
-      </object>
-    </child>
-  </object>
-  <object class="GtkWindow" id="main_menu">
-    <property name="can_focus">False</property>
-    <property name="title" translatable="yes">OpenPasen</property>
-    <signal name="destroy" handler="onDestroy" swapped="no"/>
-    <signal name="show" handler="on_main_menu_show" swapped="no"/>
-    <child type="titlebar">
-      <object class="GtkHeaderBar">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="title" translatable="yes">OpenPasen</property>
-        <property name="subtitle" translatable="yes">Menú principal</property>
-        <property name="show_close_button">True</property>
-        <child>
-          <object class="GtkMenuButton">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="popup">header_dropdown</property>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="stock">gtk-properties</property>
-              </object>
-            </child>
-          </object>
-        </child>
-        <child>
-          <object class="GtkButton" id="ayuda">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="image">help_icon</property>
-            <signal name="clicked" handler="on_ayuda_clicked" swapped="no"/>
-          </object>
-          <packing>
-            <property name="pack_type">end</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="GtkGrid">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="row_spacing">5</property>
-        <property name="column_spacing">10</property>
-        <child>
-          <object class="GtkImage" id="bienvenido_img">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="stock">gtk-missing-image</property>
-          </object>
-          <packing>
-            <property name="left_attach">2</property>
-            <property name="top_attach">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="notas">
-            <property name="label" translatable="yes">Notas</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="image">notas_img</property>
-            <signal name="clicked" handler="on_notas_clicked" swapped="no"/>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="act_eval">
-            <property name="label" translatable="yes">Actividades evaluables</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="image">act_eval_img</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="conductas">
-            <property name="label" translatable="yes">Conductas contrarias</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="image">conductas_img</property>
-          </object>
-          <packing>
-            <property name="left_attach">2</property>
-            <property name="top_attach">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="avisos_boton">
-            <property name="label" translatable="yes">Avisos</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="image">avisos_img</property>
-            <signal name="clicked" handler="on_avisos_boton_clicked" swapped="no"/>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="bienvenido_label">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="justify">center</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">0</property>
-            <property name="width">2</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
