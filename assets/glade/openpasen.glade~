@@ -3,25 +3,27 @@
 
 Copyright (C) 
 
-This file is part of .
+This file is part of OpenPasen.
 
- is free software: you can redistribute it and/or modify
+OpenPasen is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
- is distributed in the hope that it will be useful,
+OpenPasen is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with .  If not, see <http://www.gnu.org/licenses/>.
+along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-license-type gplv3 -->
+  <!-- interface-name OpenPasen -->
+  <!-- interface-description Programa Open source de seguimiento escolar de la Junta de Andaluc\303\255a -->
   <object class="GtkAboutDialog" id="about">
     <property name="can_focus">False</property>
     <property name="destroy_with_parent">True</property>
@@ -69,6 +71,7 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
   </object>
   <object class="GtkWindow" id="actividades_eval_menu">
     <property name="can_focus">False</property>
+    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
     </child>
@@ -173,7 +176,7 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
   <object class="GtkImage" id="avisos_img">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="stock">gtk-info</property>
+    <property name="stock">gtk-dialog-warning</property>
   </object>
   <object class="GtkWindow" id="centro_menu">
     <property name="can_focus">False</property>
@@ -224,6 +227,30 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="pixbuf">../img/conductacontraria.png</property>
+  </object>
+  <object class="GtkWindow" id="conductas_menu">
+    <property name="can_focus">False</property>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel" id="label_conductas">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
   </object>
   <object class="GtkImage" id="connect_icon">
     <property name="visible">True</property>
@@ -286,62 +313,6 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
         <signal name="activate" handler="onDestroy" swapped="no"/>
-      </object>
-    </child>
-  </object>
-  <object class="GtkDialog" id="login_error">
-    <property name="can_focus">False</property>
-    <property name="title" translatable="yes">Error</property>
-    <property name="window_position">center</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="icon_name">network-error</property>
-    <property name="type_hint">dialog</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="error_volver_boton">
-                <property name="label" translatable="yes">Volver</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_error_volver_boton_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Error al iniciar sesión, ¿ha escrito la contraseña correcta?</property>
-          </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
       </object>
     </child>
   </object>
@@ -451,8 +422,34 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
       <object class="GtkGrid" id="notas_grid">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="row_spacing">10</property>
-        <property name="column_spacing">10</property>
+        <property name="row_spacing">5</property>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
       </object>
     </child>
   </object>
@@ -461,6 +458,72 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
     <property name="can_focus">False</property>
     <property name="margin_right">1</property>
     <property name="pixbuf">../img/grade.png</property>
+  </object>
+  <object class="GtkWindow" id="notas_menu">
+    <property name="can_focus">False</property>
+    <signal name="delete-event" handler="delete_event" swapped="no"/>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">10</property>
+        <signal name="delete-event" handler="delete_event" swapped="no"/>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Elige la evaluación:</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="notascombo">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <items>
+              <item id="0">1ª Evaluación</item>
+              <item id="1">2ª Evaluación</item>
+              <item id="2">3ª Evaluación</item>
+            </items>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <object class="GtkButton" id="continuar_notas_boton">
+            <property name="label" translatable="yes">Continuar</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_continuar_notas_boton_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkImage" id="observaciones_img">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-info</property>
   </object>
   <object class="GtkWindow" id="main_menu">
     <property name="can_focus">False</property>
@@ -550,19 +613,6 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="conductas">
-            <property name="label" translatable="yes">Conductas contrarias</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="image">conductas_img</property>
-          </object>
-          <packing>
-            <property name="left_attach">2</property>
-            <property name="top_attach">1</property>
-          </packing>
-        </child>
-        <child>
           <object class="GtkButton" id="avisos_boton">
             <property name="label" translatable="yes">Avisos</property>
             <property name="visible">True</property>
@@ -572,8 +622,8 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
             <signal name="clicked" handler="on_avisos_boton_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">2</property>
+            <property name="left_attach">2</property>
+            <property name="top_attach">1</property>
           </packing>
         </child>
         <child>
@@ -589,7 +639,32 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
           </packing>
         </child>
         <child>
-          <placeholder/>
+          <object class="GtkButton" id="conductas">
+            <property name="label" translatable="yes">Conductas contrarias</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">conductas_img</property>
+            <signal name="clicked" handler="on_conductas_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="observaciones">
+            <property name="label" translatable="yes">Observaciones</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="image">observaciones_img</property>
+            <signal name="clicked" handler="on_observaciones_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="top_attach">2</property>
+          </packing>
         </child>
         <child>
           <placeholder/>
@@ -597,63 +672,19 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
       </object>
     </child>
   </object>
-  <object class="GtkWindow" id="notas_menu">
+  <object class="GtkWindow" id="observaciones_menu">
     <property name="can_focus">False</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
     </child>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="observaciones_box">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">10</property>
-        <signal name="delete-event" handler="delete_event" swapped="no"/>
-        <child>
-          <object class="GtkLabel">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Elige la evaluación:</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkComboBoxText" id="notascombo">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <items>
-              <item id="0">1ª Evaluación</item>
-              <item id="1">2ª Evaluación</item>
-              <item id="2">3ª Evaluación</item>
-            </items>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
+        <property name="spacing">5</property>
         <child>
           <placeholder/>
-        </child>
-        <child>
-          <object class="GtkButton" id="continuar_notas_boton">
-            <property name="label" translatable="yes">Continuar</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <signal name="clicked" handler="on_continuar_notas_boton_clicked" swapped="no"/>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">3</property>
-          </packing>
         </child>
       </object>
     </child>

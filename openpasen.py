@@ -7,6 +7,24 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 
+#Facilita las requests
+def req(method, url, body):
+    try:
+        if (method == "GET"):
+            if (body == "null"):
+                data = requests.get(url, headers=headers, cookies=jar, timeout=3)
+            else:
+                data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=3)
+        if (method == "POST"):
+            if (body == "null"):
+                data = requests.post(url, headers=headerslogin, cookies=jar, timeout=3)
+            else:
+                data = requests.post(url, headers=headerslogin, cookies=jar, data=body, timeout=3)
+        return data
+    except requests.exceptions.RequestException:
+        print("Error de conexión")
+        quit(1)
+
 # Initial variables
 headers = {
     "Content-Type": "application/json; charset=UTF-8"
@@ -19,33 +37,25 @@ headerslogin = {
 class userinfo:
     # Al conseguir iniciar sesión, establecer variables, se utilizan luego
     def __init__(self, main):
+        # Info Básica
         self.nombre = main.json()['RESULTADO'][0]['USUARIO']
+        # Mi perfil
         self.curso = main.json()['RESULTADO'][0]['MATRICULAS'][0]['CURSO']
         self.unidad = main.json()['RESULTADO'][0]['MATRICULAS'][0]['UNIDAD']
         self.denominacion = main.json()['RESULTADO'][0]['MATRICULAS'][0]['DENOMINACION']
         self.tutor = main.json()['RESULTADO'][0]['MATRICULAS'][0]['TUTOR']
-        #IDs que se usarán después
+        # Mi centro
+        # IDs que se usarán después
         self.matricula = main.json()['RESULTADO'][0]['MATRICULAS'][0]['X_MATRICULA']
         self.centro = main.json()['RESULTADO'][0]['MATRICULAS'][0]['X_CENTRO']
     
     def convcentro_get(self, evaluacion):
         bodyconv = "X_MATRICULA=" + user.matricula
-        convocatorias = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias", headers=headerslogin, cookies=jar, data=bodyconv)
+        convocatorias = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias", bodyconv)
         cantidad_convocatorias = len(convocatorias.json()['RESULTADO'])
         for i in range(0, cantidad_convocatorias):
             if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == evaluacion):
                 self.convcentro = convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']
-
-    
-#Facilitar las requests
-def req(method, url):
-    if (method == "GET"):
-        data = requests.get(url, headers=headers, cookies=jar)
-        return data
-    if (method == "POST"):
-        data = requests.post(url, headers=headers, cookies=jar)
-        return data
-
 
 # GTK Handler
 class Handler:
@@ -65,7 +75,8 @@ class Handler:
         login = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/login", headers=headerslogin, data=body)
         # Comprobando si se ha iniciado sesión correctamente
         if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
-            builder.get_object('login_error').show()
+            print("Error al iniciar sesión")
+            quit(1)
         global jar
         jar = requests.cookies.RequestsCookieJar()
         jar.set('SenecaP', login.cookies['SenecaP'], domain='www.juntadeandalucia.es', path='/')
@@ -117,7 +128,7 @@ class Handler:
         # Requests para conseguir las notas con su body. Asignación de variables iniciales
         # Para poder conseguir las notas, primero hay que conseguir la variable X_CONVCENTRO, la cual está en getConvocatorias
         bodynotas = "X_MATRICULA=" + user.matricula + "&X_CONVCENTRO=" + str(user.convcentro)
-        notas = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getNotas", headers=headerslogin, cookies=jar, data=bodynotas)
+        notas = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getNotas", bodynotas)
         cantidad_notas = len(notas.json()['RESULTADO'])
         label_asignatura = []
         label_nota = []
@@ -142,7 +153,7 @@ class Handler:
                     label_nota_ultimo = label_nota[i]
                     label_asignatura_ultimo = label_asignatura[i]
                 
-                # TODO DEPRECATED, REMPLAZAR CUANDO SEA POSIBLE
+                # TODO DEPRECATED, REMPLAZAR CUANDO SEA POSIBLE, escribe color dependiendo de la nota
                 if (int(notas.json()['RESULTADO'][i]['NOTA']) < 5):
                     label_nota[i].modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
                 elif (int(notas.json()['RESULTADO'][i]['NOTA']) == 5):
@@ -187,7 +198,7 @@ class Handler:
 
             #TODO Mostrar advertencia usando las dos filas disponibles
 
-        builder.get_object("notas_evaluacion_menu").show_all()
+        notas_menu.show_all()
 
     def on_act_eval_clicked(self, button):
         builder.get_object("actividades_eval_menu").show()
@@ -202,9 +213,35 @@ class Handler:
     # Botón avisos pulsado
     def on_avisos_boton_clicked(self, button):
         print("EN CONSTRUCCIÓN")
-        #builder.get_object("avisos").show()
-        #avisos = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos")
-        #builder.get_object("avisos_label").set_markup(avisos.json()['RESULTADO'][0]['D_AVISO']) #TODO Error
+        builder.get_object("avisos").show()
+        avisos = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos", "null")
+        if (avisos.text == '{"ESTADO":{"CODIGO":"C"},"RESULTADO":[]}'):
+            builder.get_object("avisos_label").set_markup("No hay avisos disponibles")
+        else:
+            builder.get_object("avisos_label").set_markup(avisos.json()['RESULTADO'][0]['D_AVISO']) # A veces puede fallar, investigando mejores métodos
+    
+    def on_conductas_clicked(self, button):
+        # TODO Prácticamente un placeholder
+        body_cond = "X_MATRICULA=" + user.matricula 
+        cond = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConductasContrarias", body_cond)
+        if (cond.text == '{"ESTADO":{"CODIGO":"C"},"RESULTADO":[]}'):
+            builder.get_object("label_conductas").set_markup("No tienes ninguna conducta contraria")
+        
+        builder.get_object("conductas_menu").show_all()
+    def on_observaciones_clicked(self, button):
+        obs_menu = builder.get_object("observaciones_menu")
+        obs_box = builder.get_object("observaciones_box")
+        body_obs = "X_MATRICULA=" + user.matricula
+        obs = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getObservaciones", body_obs)
+        cantidad_obs = len(obs.json()['RESULTADO'])
+        label_obs = []
+        for i in range(0, cantidad_obs):
+            label_obs.append('label_obs' + str(i))
+            label_obs[i] = Gtk.Label()
+            obs_box.add(label_obs[i])
+            label_obs[i].set_text(obs.json()['RESULTADO'][i]['PROFESOR'] + ": " + obs.json()['RESULTADO'][i]['D_MATERIAC'] + ". Escrito el " + obs.json()['RESULTADO'][i]['F_OBSMAT'] + "\n" + obs.json()['RESULTADO'][i]['T_OBSMATERIA'])
+        
+        obs_menu.show_all()
     
     #Header menú principal
     # Botón acerca de pulsado
@@ -222,7 +259,7 @@ class Handler:
     def on_centro_activate(self, button):
         builder.get_object("centro_menu").show()
         body = "X_CENTRO=" + user.centro
-        centro = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/datosCentro", headers=headerslogin, cookies=jar, data=body)
+        centro = req("POST","https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/datosCentro", body)
         centro.json()['RESULTADO'][0]['DATOS']
     
     # Botón cerrar sesión pulsado
@@ -238,7 +275,7 @@ class Handler:
     # Ejecutar cuando el menú principal se muestre
     def on_main_menu_show(self, *args):
         try:
-            main = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/infoSesion")
+            main = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/infoSesion", "null")
             print("Escribiendo datos del usuario...")
             global user
             user = userinfo(main)
@@ -249,9 +286,10 @@ class Handler:
             builder.get_object('main_menu').hide()
             print("Las cookies han expirado, generando nuevas...")
             body = 'p={"version":"11.9.1"}&USUARIO=' + config['Login']['Username'] + '&CLAVE=' + config['Login']['Password']
-            login = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/login", headers=headerslogin, data=body)
+            login = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/login", body)
             if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
-                builder.get_object('login_error').show()
+                print("Error al iniciar sesión")
+                quit(1)
             if (config['Config']['LoginRemember'] == "Y"):
                 config['Cookies'] = {
                     'SenecaP': login.cookies['SenecaP'],
