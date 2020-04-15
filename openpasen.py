@@ -62,7 +62,7 @@ class userinfo:
             if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == evaluacion):
                 self.convcentro = convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']
     
-    def getfoto():
+    def getfoto(self):
         # Para ahorrar tiempo, comprueba primero si el archivo existe
         try:
             local_file = open('imagen.png', 'rb')
