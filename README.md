@@ -14,9 +14,7 @@ https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getComuni
 
 https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getActividadesEvaluables (Actividades evaluables) | POST
 
-https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos (Avisos) | GET
-
-Hacer aparecer imagen alumno (No encuentro dónde está ubicada)
+https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos (Avisos) | GET (Está implementada pero a veces falla)
 
 # Cómo contribuir
 

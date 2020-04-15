@@ -29,7 +29,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">OpenPasen</property>
-    <property name="version">1.2</property>
+    <property name="version">1.2.5</property>
     <property name="comments" translatable="yes">Cliente open-source hecho en Python del programa de seguimiento escolar de la Junta de Andalucía.</property>
     <property name="website">https://github.com/pablouser1/OpenPasen</property>
     <property name="artists">Mark (grade.png) icon made by Prosymbols from www.flaticon.com
@@ -230,6 +230,7 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
   </object>
   <object class="GtkWindow" id="conductas_menu">
     <property name="can_focus">False</property>
+    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
     </child>
@@ -674,6 +675,7 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
   </object>
   <object class="GtkWindow" id="observaciones_menu">
     <property name="can_focus">False</property>
+    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child type="titlebar">
       <placeholder/>
     </child>

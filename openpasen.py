@@ -3,12 +3,13 @@
 import requests
 import json
 import configparser
+import shutil
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 
 #Facilita las requests
-def req(method, url, body):
+def req(method, url, body = "null"):
     try:
         if (method == "GET"):
             if (body == "null"):
@@ -17,10 +18,12 @@ def req(method, url, body):
                 data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=3)
         if (method == "POST"):
             if (body == "null"):
-                data = requests.post(url, headers=headerslogin, cookies=jar, timeout=3)
+                data = requests.post(url, headers=headerspost, cookies=jar, timeout=3)
             else:
-                data = requests.post(url, headers=headerslogin, cookies=jar, data=body, timeout=3)
+                data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=3)
         return data
+    
+    # Timeout
     except requests.exceptions.RequestException:
         print("Error de conexión")
         quit(1)
@@ -30,9 +33,11 @@ headers = {
     "Content-Type": "application/json; charset=UTF-8"
 }
 
-headerslogin = {
+headerspost = {
     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
 }
+
+base_url = "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/" # Este es el comienzo de todas las URLs de PASEN
 
 class userinfo:
     # Al conseguir iniciar sesión, establecer variables, se utilizan luego
@@ -51,28 +56,41 @@ class userinfo:
     
     def convcentro_get(self, evaluacion):
         bodyconv = "X_MATRICULA=" + user.matricula
-        convocatorias = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConvocatorias", bodyconv)
+        convocatorias = req("POST", base_url + "getConvocatorias", bodyconv)
         cantidad_convocatorias = len(convocatorias.json()['RESULTADO'])
         for i in range(0, cantidad_convocatorias):
             if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == evaluacion):
                 self.convcentro = convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']
+    
+    def getfoto():
+        # Para ahorrar tiempo, comprueba primero si el archivo existe
+        try:
+            local_file = open('imagen.png', 'rb')
+        except IOError:
+            # Si no existe lo descarga
+            bodyfoto = "X_MATRICULA=" + user.matricula
+            foto_req = requests.post(base_url + "imageAlumno", headers=headerspost, cookies=jar, data=bodyfoto, stream=True, timeout=3)
+            # Guarda el archivo localmente
+            local_file = open('imagen.png', 'wb')
+            foto_req.raw.decode_content = True
+            shutil.copyfileobj(foto_req.raw, local_file)
 
 # GTK Handler
 class Handler:
     # Global
     def onDestroy(self, *args):
        Gtk.main_quit()
-    
+
     # Muy importante, hace que al abrir y cerrar un widget, en el momento de volver a abrirlo se muestre correctamente
     def delete_event(self, widget, event):
         widget.hide()
         return True
-    
+
     # --------- Botones --------- #
     # Botón login pulsado
     def on_login_clicked(self, button):
         body = 'p={"version":"11.9.1"}&USUARIO=' + builder.get_object('username').get_text() + '&CLAVE=' + builder.get_object('password').get_text()
-        login = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/login", headers=headerslogin, data=body)
+        login = req("POST", base_url + "login", body)
         # Comprobando si se ha iniciado sesión correctamente
         if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
             print("Error al iniciar sesión")
@@ -99,12 +117,12 @@ class Handler:
         else:
             config['Config'] = {
                 'LoginRemember': "N"}
-        
+
         with open('config.ini', 'w') as configfile:
             config.write(configfile)
         builder.get_object("login_menu").hide()
         builder.get_object("main_menu").show()
-    
+
     # Ventana error al iniciar sesión
     def on_error_volver_boton_clicked(self, button):
         builder.get_object("login_error").destroy()
@@ -128,7 +146,7 @@ class Handler:
         # Requests para conseguir las notas con su body. Asignación de variables iniciales
         # Para poder conseguir las notas, primero hay que conseguir la variable X_CONVCENTRO, la cual está en getConvocatorias
         bodynotas = "X_MATRICULA=" + user.matricula + "&X_CONVCENTRO=" + str(user.convcentro)
-        notas = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getNotas", bodynotas)
+        notas = req("POST", base_url + "getNotas", bodynotas)
         cantidad_notas = len(notas.json()['RESULTADO'])
         label_asignatura = []
         label_nota = []
@@ -207,14 +225,14 @@ class Handler:
         acteval_evaluacion = builder.get_object("actevalcombo").get_active_text()
         user.convcentro_get(acteval_evaluacion)
 
-        #acteval = requests.post("https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getActividadesEvaluables", headers=headerslogin, cookies=jar, data=bodynotas)
+        #acteval = requests.post(base_url + "getActividadesEvaluables", headers=headerslogin, cookies=jar, data=bodynotas)
         # TODO Continuar con las actividades evaluables
 
     # Botón avisos pulsado
     def on_avisos_boton_clicked(self, button):
         print("EN CONSTRUCCIÓN")
         builder.get_object("avisos").show()
-        avisos = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos", "null")
+        avisos = req("GET", base_url + "avisos")
         if (avisos.text == '{"ESTADO":{"CODIGO":"C"},"RESULTADO":[]}'):
             builder.get_object("avisos_label").set_markup("No hay avisos disponibles")
         else:
@@ -223,7 +241,7 @@ class Handler:
     def on_conductas_clicked(self, button):
         # TODO Prácticamente un placeholder
         body_cond = "X_MATRICULA=" + user.matricula 
-        cond = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getConductasContrarias", body_cond)
+        cond = req("POST", base_url + "getConductasContrarias", body_cond)
         if (cond.text == '{"ESTADO":{"CODIGO":"C"},"RESULTADO":[]}'):
             builder.get_object("label_conductas").set_markup("No tienes ninguna conducta contraria")
         
@@ -232,7 +250,7 @@ class Handler:
         obs_menu = builder.get_object("observaciones_menu")
         obs_box = builder.get_object("observaciones_box")
         body_obs = "X_MATRICULA=" + user.matricula
-        obs = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getObservaciones", body_obs)
+        obs = req("POST", base_url + "getObservaciones", body_obs)
         cantidad_obs = len(obs.json()['RESULTADO'])
         label_obs = []
         for i in range(0, cantidad_obs):
@@ -259,7 +277,7 @@ class Handler:
     def on_centro_activate(self, button):
         builder.get_object("centro_menu").show()
         body = "X_CENTRO=" + user.centro
-        centro = req("POST","https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/datosCentro", body)
+        centro = req("POST", base_url + "datosCentro", body)
         centro.json()['RESULTADO'][0]['DATOS']
     
     # Botón cerrar sesión pulsado
@@ -275,10 +293,10 @@ class Handler:
     # Ejecutar cuando el menú principal se muestre
     def on_main_menu_show(self, *args):
         try:
-            main = req("GET", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/infoSesion", "null")
-            print("Escribiendo datos del usuario...")
+            main = req("GET", base_url + "infoSesion")
             global user
             user = userinfo(main)
+            user.getfoto()
             builder.get_object("bienvenido_label").set_text("Bienvenido, " + user.nombre)
         
         #Si hay un KeyError es que las cookies han caducado, por lo que intenta volver a iniciar sesión
@@ -286,19 +304,30 @@ class Handler:
             builder.get_object('main_menu').hide()
             print("Las cookies han expirado, generando nuevas...")
             body = 'p={"version":"11.9.1"}&USUARIO=' + config['Login']['Username'] + '&CLAVE=' + config['Login']['Password']
-            login = req("POST", "https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/login", body)
+            login = req("POST", base_url + "login", body)
+
             if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
                 print("Error al iniciar sesión")
                 quit(1)
-            if (config['Config']['LoginRemember'] == "Y"):
-                config['Cookies'] = {
-                    'SenecaP': login.cookies['SenecaP'],
-                    'JSESSIONID': login.cookies['JSESSIONID']}
-                with open('config.ini', 'w') as configfile:
-                    config.write(configfile)
-                jar.set('SenecaP', config['Cookies']['senecap'], domain='www.juntadeandalucia.es', path='/')
-                jar.set('JSESSIONID', config['Cookies']['JSESSIONID'], domain='www.juntadeandalucia.es', path='/')
-                builder.get_object('main_menu').show_all()
+            
+            # Algo ha tenido que cambiar en los servidores de la Junta, de momento esto funciona
+            try:
+                jar.set('JSESSIONID', login.cookies['JSESSIONID'], domain='www.juntadeandalucia.es', path='/')
+                config.set('Cookies', 'JSESSIONID', login.cookies['JSESSIONID'])
+            except KeyError:
+                print("JSESSIONID no recibido")
+
+            try:
+                jar.set('SenecaP', login.cookies['SenecaP'], domain='www.juntadeandalucia.es', path='/')
+                config.set('Cookies', 'SenecaP', login.cookies['SenecaP'])
+            except KeyError:
+                print("SenecaP no recibido")
+            
+            with open('config.ini', 'w') as configfile:
+                config.write(configfile)
+
+            print("Reiniciado")
+            builder.get_object('main_menu').show_all()
 
 # Iniciar builder y mostrar menú login
 config = configparser.ConfigParser()
@@ -311,7 +340,7 @@ builder.connect_signals(Handler())
 try:
     config.items('Login')
     jar = requests.cookies.RequestsCookieJar()
-    jar.set('SenecaP', config['Cookies']['senecap'], domain='www.juntadeandalucia.es', path='/')
+    jar.set('SenecaP', config['Cookies']['SenecaP'], domain='www.juntadeandalucia.es', path='/')
     jar.set('JSESSIONID', config['Cookies']['JSESSIONID'], domain='www.juntadeandalucia.es', path='/')
     builder.get_object("main_menu").show()
 except configparser.NoSectionError:
