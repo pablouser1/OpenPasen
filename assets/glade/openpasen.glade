@@ -578,7 +578,7 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
           <object class="GtkImage" id="bienvenido_img">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="pixbuf">../../imagen.png</property>
+            <property name="pixbuf">../../data/imagen.png</property>
           </object>
           <packing>
             <property name="left_attach">2</property>

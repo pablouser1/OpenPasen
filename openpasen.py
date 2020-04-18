@@ -65,7 +65,7 @@ class userinfo:
     def getfoto(self):
         # Para ahorrar tiempo, comprueba primero si el archivo existe
         try:
-            local_file = open('imagen.png', 'rb')
+            local_file = open('data/imagen.png', 'rb')
         except IOError:
             # Si no existe lo descarga
             bodyfoto = "X_MATRICULA=" + user.matricula
@@ -118,7 +118,7 @@ class Handler:
             config['Config'] = {
                 'LoginRemember': "N"}
 
-        with open('config.ini', 'w') as configfile:
+        with open('data/config.ini', 'w') as configfile:
             config.write(configfile)
         builder.get_object("login_menu").hide()
         builder.get_object("main_menu").show()
@@ -284,7 +284,7 @@ class Handler:
     def on_cerrarsesion_activate(self,button):
         config.remove_section('Cookies')
         config.remove_section('Login')
-        with open("config.ini", "w") as configfile:
+        with open("data/config.ini", "w") as configfile:
             config.write(configfile)
         builder.get_object('main_menu').hide()
         builder.get_object('login_menu').show()
@@ -323,7 +323,7 @@ class Handler:
             except KeyError:
                 print("SenecaP no recibido")
             
-            with open('config.ini', 'w') as configfile:
+            with open('data/config.ini', 'w') as configfile:
                 config.write(configfile)
 
             print("Reiniciado")
@@ -331,7 +331,7 @@ class Handler:
 
 # Iniciar builder y mostrar menú login
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('data/config.ini')
 builder = Gtk.Builder()
 builder.add_from_file("assets/glade/openpasen.glade")
 builder.connect_signals(Handler())
