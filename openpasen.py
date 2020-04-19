@@ -71,7 +71,7 @@ class userinfo:
             bodyfoto = "X_MATRICULA=" + user.matricula
             foto_req = requests.post(base_url + "imageAlumno", headers=headerspost, cookies=jar, data=bodyfoto, stream=True, timeout=3)
             # Guarda el archivo localmente
-            local_file = open('imagen.png', 'wb')
+            local_file = open('data/imagen.png', 'wb')
             foto_req.raw.decode_content = True
             shutil.copyfileobj(foto_req.raw, local_file)
 
@@ -90,7 +90,7 @@ class Handler:
     # Botón login pulsado
     def on_login_clicked(self, button):
         body = 'p={"version":"11.9.1"}&USUARIO=' + builder.get_object('username').get_text() + '&CLAVE=' + builder.get_object('password').get_text()
-        login = req("POST", base_url + "login", body)
+        login = requests.post(base_url + "login", headers=headerspost, data=body)
         # Comprobando si se ha iniciado sesión correctamente
         if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
             print("Error al iniciar sesión")
