@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import common
 import requests
+import os
 import shutil
 
 def init():
@@ -73,7 +74,7 @@ def login(logininfo):
 
 def checksession():
     try:
-        req("GET", base_url + "infoSesion")
+        req("GET", base_url + "infoSesion").json()['RESULTADO'][0]['USUARIO']
         print("Sesión ok")
     except KeyError:
         print("Las cookies han expirado, generando nuevas...")
@@ -152,3 +153,19 @@ def observaciones():
     body_obs = "X_MATRICULA=" + user["matricula"]
     observaciones = req("POST", base_url + "getObservaciones", body_obs)
     return observaciones
+
+def centro():
+    body = "X_CENTRO=" + user["centro"]
+    centro = req("POST", base_url + "datosCentro", body)
+    return centro
+
+def cerrarsesion():
+    os.remove("data/imagen.png")
+    if (config['Config']['loginremember'] == "N"):
+        # Al no haber configuración escrita respecto al login, ignora esta parte
+        pass
+    else:
+        config.remove_section('Cookies')
+        config.remove_section('Login')
+        with open("data/config.ini", "w") as configfile:
+            config.write(configfile)

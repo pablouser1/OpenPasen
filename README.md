@@ -6,6 +6,10 @@ Utiliza Python 3, Glade, y las librerías requests, configparser y GTK 3.
 
 Actualmente testeado usando una cuenta de PASEN de alumno y usando el sistema operativo GNU/Linux.
 
+# Cómo usar
+
+Una vez instaladas todas las librerías necesarias, inicia el programa openpython.py.
+
 # TODO
 
 Queda por implementar las siguientes funciones:

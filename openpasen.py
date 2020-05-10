@@ -134,6 +134,7 @@ class Handler:
         # TODO, completar
 
     def on_continuar_acteval_boton_clicked(self,button):
+        # TODO, completar
         pass
 
     # Avisos
@@ -179,18 +180,23 @@ class Handler:
 
     # Perfil
     def on_perfil_activate(self, button):
+        builder.get_object("curso_label").set_markup(user["curso"])
+        builder.get_object("unidad_label").set_markup(user["unidad"])
+        builder.get_object("centro_label").set_markup(user["denominacion"])
+        builder.get_object("tutor_label").set_markup(user["tutor"])
         builder.get_object("perfil_menu").show()
-        # TODO, completar
 
     # Mi centro
     def on_centro_activate(self, button):
+        centro = api.centro()
         builder.get_object("centro_menu").show()
         # TODO, completar
 
     # Cerrar sesión
     def on_cerrarsesion_activate(self,button):
-        # TODO, completar
-        pass
+        api.cerrarsesion()
+        builder.get_object('main_menu').hide()
+        builder.get_object('login_menu').show()
 
 # Initial startup
 common.init()
