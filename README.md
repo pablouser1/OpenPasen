@@ -4,7 +4,7 @@ Esta es una implementación open-source distribuida bajo la licencia GPLv3 del p
 
 Utiliza Python 3, Glade, y las librerías requests, configparser y GTK 3.
 
-Actualmente testeado usando una cuenta de PASEN de alumno y usando el sistema operativoo GNU/Linux.
+Actualmente testeado usando una cuenta de PASEN de alumno y usando el sistema operativo GNU/Linux.
 
 # TODO
 
@@ -15,6 +15,12 @@ https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getComuni
 https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getActividadesEvaluables (Actividades evaluables) | POST
 
 https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos (Avisos) | GET (Está implementada pero a veces falla)
+
+Fallback para fallos de conexión
+
+setup.py / Instalador
+
+Comprobar compatibilidad con Windows y Mac
 
 # Cómo contribuir
 
