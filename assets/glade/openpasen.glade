@@ -20,7 +20,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.22"/>
   <!-- interface-license-type gplv3 -->
   <!-- interface-name OpenPasen -->
   <!-- interface-description Programa Open source de seguimiento escolar de la Junta de Andaluc\303\255a -->
@@ -412,48 +412,6 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
       <placeholder/>
     </child>
   </object>
-  <object class="GtkWindow" id="notas_evaluacion_menu">
-    <property name="can_focus">False</property>
-    <property name="destroy_with_parent">True</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
-    <child>
-      <object class="GtkGrid" id="notas_grid">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="row_spacing">5</property>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
-  </object>
   <object class="GtkImage" id="notas_img">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -513,6 +471,41 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
             <property name="fill">True</property>
             <property name="position">3</property>
           </packing>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+  </object>
+  <object class="GtkListStore" id="notas_store">
+    <columns>
+      <!-- column-name Asignatura -->
+      <column type="gchararray"/>
+      <!-- column-name Nota -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkWindow" id="notas_evaluacion_menu">
+    <property name="can_focus">False</property>
+    <property name="destroy_with_parent">True</property>
+    <signal name="delete-event" handler="delete_event" swapped="no"/>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="shadow_type">in</property>
+        <child>
+          <object class="GtkTreeView" id="notas_treeview">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="model">notas_store</property>
+            <property name="search_column">0</property>
+            <property name="enable_grid_lines">vertical</property>
+            <child internal-child="selection">
+              <object class="GtkTreeSelection"/>
+            </child>
+          </object>
         </child>
       </object>
     </child>
@@ -672,17 +665,35 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
       </object>
     </child>
   </object>
+  <object class="GtkListStore" id="observaciones_store">
+    <columns>
+      <!-- column-name Asignatura -->
+      <column type="gchararray"/>
+      <!-- column-name Mensaje -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkWindow" id="observaciones_menu">
     <property name="can_focus">False</property>
+    <property name="destroy_with_parent">True</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
-      <object class="GtkBox" id="observaciones_box">
+      <object class="GtkScrolledWindow">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">5</property>
+        <property name="can_focus">True</property>
+        <property name="shadow_type">in</property>
+        <property name="propagate_natural_width">True</property>
+        <property name="propagate_natural_height">True</property>
         <child>
-          <placeholder/>
+          <object class="GtkTreeView" id="observaciones_treeview">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="model">observaciones_store</property>
+            <property name="enable_grid_lines">vertical</property>
+            <child internal-child="selection">
+              <object class="GtkTreeSelection"/>
+            </child>
+          </object>
         </child>
       </object>
     </child>

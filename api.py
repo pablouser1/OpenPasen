@@ -134,6 +134,23 @@ def convcentro(evaluacion):
         if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == evaluacion):
             user.update({"convcentro" : convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']})
 
+def getNotas():
+    bodynotas = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(user["convcentro"])
+    notas = req("POST", base_url + "getNotas", bodynotas)
+    return notas
+
+def getNotasSolicitadas(notas, notas_evaluacion):
+    notas_list = []
+    for i in range(0, len(notas.json()['RESULTADO'])):
+        if (notas.json()['RESULTADO'][i]['CONV'] == notas_evaluacion):
+            notas_list.append(i)
+    return notas_list
+
+def actividadesevaluables():
+    bodyevaluacones = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(user["convcentro"])
+    acteval = req("POST", base_url + "getActividadesEvaluables", bodyevaluacones)
+    return acteval
+
 def avisos():
     avisos = req("GET", base_url + "avisos")
     print(avisos.text)
@@ -143,11 +160,6 @@ def conductas():
     bodyconductas = "X_MATRICULA=" + user["matricula"]
     conductas = req("POST", base_url + "getConductasContrarias", bodyconductas)
     return conductas
-
-def notas():
-    bodynotas = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(user["convcentro"])
-    notas = req("POST", base_url + "getNotas", bodynotas)
-    return notas
 
 def observaciones():
     body_obs = "X_MATRICULA=" + user["matricula"]

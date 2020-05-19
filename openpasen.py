@@ -42,100 +42,43 @@ class Handler:
     # Notas
     def on_notas_clicked(self,button):
         builder.get_object("notas_menu").show()
-
-        # TODO, completar
     def on_continuar_notas_boton_clicked(self, button):
+        columns = [
+            "Asignatura",
+            "Nota"
+        ]
         notas_evaluacion = builder.get_object("notascombo").get_active_text()
         api.convcentro(notas_evaluacion)
         notas_menu = builder.get_object("notas_evaluacion_menu")
-        notas_grid = builder.get_object("notas_grid")
+        notas = api.getNotas()
+        notas_solicitadas = api.getNotasSolicitadas(notas, notas_evaluacion)
+        tree = builder.get_object("notas_treeview")
+        store = builder.get_object("notas_store")
 
-        # Muy importante, hace que el usuario pueda elegir otra evaluación en la misma sesión sin recibir los mismos resultados
-        notas_grid.destroy()
-
-        notas_menu.add(notas_grid)
-        # Requests para conseguir las notas con su body. Asignación de variables iniciales
-        # Para poder conseguir las notas, primero hay que conseguir la variable X_CONVCENTRO, la cual está en getConvocatorias
-        notas = api.notas()
-        cantidad_notas = len(notas.json()['RESULTADO'])
-        label_asignatura = []
-        label_nota = []
-        nota_media = []
-        for i in range(0, cantidad_notas):
-            label_asignatura.append('label_asignatura' + str(i))
-            label_asignatura[i] = Gtk.Label()
-
-            label_nota.append('label_asignatura' + str(i))
-            label_nota[i] = Gtk.Label()
-            
-            if (notas.json()['RESULTADO'][i]['CONV'] == notas_evaluacion):
-                if (i == 0):
-                    print("Creado")
-                    notas_grid.add(label_asignatura[i])
-                    notas_grid.attach_next_to(label_nota[i], label_asignatura[i], Gtk.PositionType.RIGHT, 1, 1)
-                else:
-                    notas_grid.attach_next_to(label_asignatura[i], label_asignatura[i-1], Gtk.PositionType.BOTTOM, 1, 1)
-                    notas_grid.attach_next_to(label_nota[i], label_asignatura[i], Gtk.PositionType.RIGHT, 1, 1)
-                
-                if (i == cantidad_notas - 1):
-                    label_nota_ultimo = label_nota[i]
-                    label_asignatura_ultimo = label_asignatura[i]
-                
-                # TODO DEPRECATED, REMPLAZAR CUANDO SEA POSIBLE, escribe color dependiendo de la nota
-                if (int(notas.json()['RESULTADO'][i]['NOTA']) < 5):
-                    label_nota[i].modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
-                elif (int(notas.json()['RESULTADO'][i]['NOTA']) == 5):
-                    label_nota[i].modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("orange"))
-                elif (int(notas.json()['RESULTADO'][i]['NOTA']) > 5):
-                    label_nota[i].modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
-                
-                label_asignatura[i].set_text(notas.json()['RESULTADO'][i]['D_MATERIA'])
-                label_nota[i].set_text(notas.json()['RESULTADO'][i]['NOTA'])
-                nota_media.append(int(notas.json()['RESULTADO'][i]['NOTA']))
-                print("Escribiendo asignatura (" + str(i) + "): " + notas.json()['RESULTADO'][i]['D_MATERIA'] + " y nota: " + notas.json()['RESULTADO'][i]['NOTA'] + " en " + str(label_asignatura[i]) + " y " + str(label_nota[i]))
-
-            else:
-                print(notas.json()['RESULTADO'][i]['CONV'] + " y " + notas_evaluacion + " no coinciden")
-        
-        if (label_nota == []):
-            label_notfound = Gtk.Label()
-            notas_grid.add(label_notfound)
-            label_notfound.set_text("No hay notas en esta evaluación")
-        
-        else:
-            # Detalles finales, media y aviso
-            media_final = sum(nota_media) / len(nota_media)
-            label_media_titulo = Gtk.Label()
-            label_media_num = Gtk.Label()
-            #label_advertencia_txt = Gtk.Label()
-
-            notas_grid.attach_next_to(label_media_titulo, label_asignatura_ultimo, Gtk.PositionType.BOTTOM, 1, 2)
-            notas_grid.attach_next_to(label_media_num, label_nota_ultimo, Gtk.PositionType.BOTTOM, 1, 2)
-            #notas_grid.attach_next_to(label_advertencia_txt, label_media_num, Gtk.PositionType.BOTTOM, 2, 1)
-            label_media_titulo.set_text("Tu media de esta evaluación es: ")
-
-            if (int(notas.json()['RESULTADO'][i]['NOTA']) < 5):
-                label_media_num.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
-            elif (int(notas.json()['RESULTADO'][i]['NOTA']) == 5):
-                label_media_num.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("orange"))
-            elif (int(notas.json()['RESULTADO'][i]['NOTA']) > 5):
-                label_media_num.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
-            
-            label_media_num.set_text(str(round(media_final, 2)))
-            #label_advertencia_txt.set_text(notas.json()['ESTADO']['DESCRIPCION'])
-
-            #TODO Mostrar advertencia usando las dos filas disponibles
+        # Necesario para que no se reincluye al volver a entrar
+        store.clear()
+        for i in range(0, len(notas_solicitadas)):
+            store.append([notas.json()['RESULTADO'][notas_solicitadas[i]]['D_MATERIA'], notas.json()['RESULTADO'][notas_solicitadas[i]]['NOTA']])
+        for i, column in enumerate(columns):
+            cell = Gtk.CellRendererText()
+            if (int(notas.json()['RESULTADO'][notas_solicitadas[i]]['NOTA']) < 5):
+                # TODO, cambiar color a rojo
+                pass
+            col = Gtk.TreeViewColumn(column, cell, text=i)
+            tree.append_column(col)
 
         notas_menu.show_all()
 
     # Actividades evaluables
     def on_act_eval_clicked(self, button):
         builder.get_object("actividades_eval_menu").show()
-        # TODO, completar
-
     def on_continuar_acteval_boton_clicked(self,button):
         # TODO, completar
-        pass
+        act_evaluacion = builder.get_object("activiadescombo").get_active_text()
+        api.convcentro(act_evaluacion)
+        act_menu = builder.get_object("act_evaluacion_menu")
+        act_grid = builder.get_object("act_grid")
+        acteval = api.actividadesevaluables()
 
     # Avisos
     def on_avisos_boton_clicked(self, button):
@@ -160,19 +103,24 @@ class Handler:
 
     # Observaciones del alumnado
     def on_observaciones_clicked(self, button):
-        obs_menu = builder.get_object("observaciones_menu")
-        obs_box = builder.get_object("observaciones_box")
+        columns = [
+            "Asignatura",
+            "Mensaje"
+        ]
         observaciones = api.observaciones()
-        cantidad_obs = len(observaciones.json()['RESULTADO'])
-        label_obs = []
-        for i in range(0, cantidad_obs):
-            label_obs.append('label_obs' + str(i))
-            label_obs[i] = Gtk.Label()
-            obs_box.add(label_obs[i])
-            label_obs[i].set_text(observaciones.json()['RESULTADO'][i]['PROFESOR'] + ": " + observaciones.json()['RESULTADO'][i]['D_MATERIAC'] + ". Escrito el " + observaciones.json()['RESULTADO'][i]['F_OBSMAT'] + "\n" + observaciones.json()['RESULTADO'][i]['T_OBSMATERIA'])
-        
-        obs_menu.show_all()
+        tree = builder.get_object("observaciones_treeview")
+        store = builder.get_object("observaciones_store")
 
+        # Necesario para que no se reincluye al volver a entrar
+        store.clear()
+        for i in range(0, len(observaciones.json()['RESULTADO'])):
+            store.append([observaciones.json()['RESULTADO'][i]['D_MATERIAC'],observaciones.json()['RESULTADO'][i]['T_OBSMATERIA']])
+        for i, column in enumerate(columns):
+            cell = Gtk.CellRendererText()
+            col = Gtk.TreeViewColumn(column, cell, text=i)
+            tree.append_column(col)
+
+        builder.get_object("observaciones_menu").show()
     # -- Header menú principal -- #
     # Acerca de
     def on_ayuda_clicked(self, button):
@@ -189,6 +137,7 @@ class Handler:
     # Mi centro
     def on_centro_activate(self, button):
         centro = api.centro()
+        print(centro.text)
         builder.get_object("centro_menu").show()
         # TODO, completar
 
