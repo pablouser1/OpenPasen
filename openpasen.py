@@ -18,7 +18,7 @@ class Handler:
     def delete_event(self, widget, event):
         widget.hide()
         return True
-    
+
     # --------- Botones --------- #
 
     # Botón login pulsado
@@ -52,22 +52,22 @@ class Handler:
         notas_menu = builder.get_object("notas_evaluacion_menu")
         notas = api.getNotas()
         notas_solicitadas = api.getNotasSolicitadas(notas, notas_evaluacion)
+        nota_media = []
         tree = builder.get_object("notas_treeview")
         store = builder.get_object("notas_store")
-
-        # Necesario para que no se reincluye al volver a entrar
         store.clear()
         for i in range(0, len(notas_solicitadas)):
-            store.append([notas.json()['RESULTADO'][notas_solicitadas[i]]['D_MATERIA'], notas.json()['RESULTADO'][notas_solicitadas[i]]['NOTA']])
+            store.insert(i, [notas.json()['RESULTADO'][notas_solicitadas[i]]['D_MATERIA'], notas.json()['RESULTADO'][notas_solicitadas[i]]['NOTA']])
+            nota_media.append(int(notas.json()['RESULTADO'][notas_solicitadas[i]]['NOTA']))
         for i, column in enumerate(columns):
             cell = Gtk.CellRendererText()
-            if (int(notas.json()['RESULTADO'][notas_solicitadas[i]]['NOTA']) < 5):
-                # TODO, cambiar color a rojo
-                pass
             col = Gtk.TreeViewColumn(column, cell, text=i)
             tree.append_column(col)
 
-        notas_menu.show_all()
+        # Nota media
+        media_final = sum(nota_media) / len(nota_media)
+        builder.get_object("notas_media").set_markup("Tu nota media es de " + str(round(media_final, 2)))
+        notas_menu.show()
 
     # Actividades evaluables
     def on_act_eval_clicked(self, button):
@@ -161,6 +161,9 @@ if (start == "main_menu"):
 builder = Gtk.Builder()
 builder.add_from_file("assets/glade/openpasen.glade")
 builder.connect_signals(Handler())
+
+# Establece imagen del usuario, quizás hay una mejor forma de hacer esto
+builder.get_object("bienvenido_img").set_from_file(common.config_path + "imagen.png")
 
 builder.get_object(str(start)).show()
 Gtk.main()

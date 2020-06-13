@@ -3,14 +3,25 @@
 import configparser
 import requests
 import api
+import os
+from pathlib import Path
 def init():
+    # Variables globales, se usarán a lo largo de todo el programa
     global jar
     jar = requests.cookies.RequestsCookieJar()
     global config
     config = configparser.ConfigParser()
+    # TODO, configuración exclusiva de Linux
+    global config_path
+    config_path = str(Path.home()) + "/.config/openpasen/" # Localización de la configuración
 
 def getsession():
-    config.read('data/config.ini')
+    try:
+        os.mkdir(str(Path.home()) + "/.config/openpasen")
+        print("Configuración no encontrada, creando...")
+    except FileExistsError:
+        print("Configuración encontrada")
+    config.read(config_path + "config.ini")
     try:
         config.items('Login')
         jar.set('SenecaP', config['Cookies']['SenecaP'], domain='seneca.juntadeandalucia.es', path='/')

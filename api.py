@@ -69,7 +69,7 @@ def login(logininfo):
     else:
         config['Config'] = {
             'LoginRemember': "N"}
-    with open('data/config.ini', 'w') as configfile:
+    with open(common.config_path + "config.ini", 'w') as configfile:
         config.write(configfile)
 
 def checksession():
@@ -95,7 +95,7 @@ def checksession():
             config.set('Cookies', 'SenecaP', login.cookies['SenecaP'])
         except KeyError:
             print("SenecaP no recibido")
-        with open('data/config.ini', 'w') as configfile:
+        with open(common.config_path + "config.ini", 'w') as configfile:
             config.write(configfile)
 
 def userinfo():
@@ -111,7 +111,7 @@ def userinfo():
         "centro" : main['RESULTADO'][0]['MATRICULAS'][0]['X_CENTRO'],
         }
     try:
-        foto_local = open('data/imagen.png', 'rb')
+        foto_local = open(common.config_path + "imagen.png", 'rb')
         print("Imagen encontrada")
     except IOError:
         print("Foto no encontrada")
@@ -119,7 +119,7 @@ def userinfo():
         bodyfoto = "X_MATRICULA=" + user["matricula"]
         foto_req = requests.post(base_url + "imageAlumno", headers=headerspost, cookies=jar, data=bodyfoto, stream=True, timeout=3)
         # Guarda el archivo localmente
-        foto_local = open('data/imagen.png', 'wb')
+        foto_local = open(common.config_path + "imagen.png", 'wb')
         foto_req.raw.decode_content = True
         shutil.copyfileobj(foto_req.raw, foto_local)
     
@@ -172,12 +172,12 @@ def centro():
     return centro
 
 def cerrarsesion():
-    os.remove("data/imagen.png")
+    os.remove(common.config_path + "imagen.png")
     if (config['Config']['loginremember'] == "N"):
         # Al no haber configuración escrita respecto al login, ignora esta parte
         pass
     else:
         config.remove_section('Cookies')
         config.remove_section('Login')
-        with open("data/config.ini", "w") as configfile:
+        with open(common.config_path + "config.ini", "w") as configfile:
             config.write(configfile)
