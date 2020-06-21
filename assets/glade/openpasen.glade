@@ -29,7 +29,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">OpenPasen</property>
-    <property name="version">1.2.5</property>
+    <property name="version">1.2.6</property>
     <property name="comments" translatable="yes">Cliente open-source hecho en Python del programa de seguimiento escolar de la Junta de Andalucía.</property>
     <property name="website">https://github.com/pablouser1/OpenPasen</property>
     <property name="artists">Mark (grade.png) icon made by Prosymbols from www.flaticon.com
@@ -147,7 +147,19 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
               <placeholder/>
             </child>
             <child>
-              <placeholder/>
+              <object class="GtkButton" id="avisos_ok">
+                <property name="label" translatable="yes">Aceptar</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_avisos_ok_clicked" swapped="no"/>
+                <signal name="destroy-event" handler="delete_event" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
             </child>
           </object>
           <packing>
@@ -469,17 +481,6 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkSpinner" id="notas_spinner">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">4</property>
           </packing>
         </child>
       </object>

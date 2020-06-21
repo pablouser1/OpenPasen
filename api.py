@@ -132,19 +132,18 @@ def convcentro(evaluacion):
     cantidad_convocatorias = len(convocatorias.json()['RESULTADO'])
     for i in range(0, cantidad_convocatorias):
         if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == evaluacion):
-            user.update({"convcentro" : convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']})
+            return convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']
 
-def getNotas():
-    bodynotas = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(user["convcentro"])
+def getNotas(convcentro, notas_evaluacion):
+    bodynotas = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(convcentro)
     notas = req("POST", base_url + "getNotas", bodynotas)
-    return notas
-
-def getNotasSolicitadas(notas, notas_evaluacion):
-    notas_list = []
-    for i in range(0, len(notas.json()['RESULTADO'])):
-        if (notas.json()['RESULTADO'][i]['CONV'] == notas_evaluacion):
-            notas_list.append(i)
-    return notas_list
+    asignaturas_list = []
+    notas_numero_list = []
+    for i in range(0,len(notas.json()['RESULTADO'])):
+        asignaturas_list.append(notas.json()['RESULTADO'][i]['D_MATERIA'])
+        notas_numero_list.append(notas.json()['RESULTADO'][i]['NOTA'])
+    
+    return asignaturas_list, notas_numero_list
 
 def actividadesevaluables():
     bodyevaluacones = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(user["convcentro"])

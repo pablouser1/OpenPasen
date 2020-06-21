@@ -32,6 +32,7 @@ class Handler:
         api.login(logininfo)
         global user
         user = api.userinfo()
+        builder.get_object("bienvenido_img").set_from_file(common.config_path + "imagen.png") # Perfil usuario
         builder.get_object("login_menu").hide()
         builder.get_object("main_menu").show()
     
@@ -43,41 +44,40 @@ class Handler:
     def on_notas_clicked(self,button):
         builder.get_object("notas_menu").show()
     def on_continuar_notas_boton_clicked(self, button):
-        columns = [
-            "Asignatura",
-            "Nota"
-        ]
+        # TODO, la tabla no vuelve a salir una vez cerrada
         notas_evaluacion = builder.get_object("notascombo").get_active_text()
-        api.convcentro(notas_evaluacion)
-        notas_menu = builder.get_object("notas_evaluacion_menu")
-        notas = api.getNotas()
-        notas_solicitadas = api.getNotasSolicitadas(notas, notas_evaluacion)
-        nota_media = []
+        convcentro = api.convcentro(notas_evaluacion)
+        # Asignaturas_list tiene los nombres de las asignaturas mientras que notas_numero_list tiene la nota numérica.
+        asignaturas_list, notas_numero_list = api.getNotas(convcentro, notas_evaluacion)
         tree = builder.get_object("notas_treeview")
         store = builder.get_object("notas_store")
         store.clear()
-        for i in range(0, len(notas_solicitadas)):
-            store.insert(i, [notas.json()['RESULTADO'][notas_solicitadas[i]]['D_MATERIA'], notas.json()['RESULTADO'][notas_solicitadas[i]]['NOTA']])
-            nota_media.append(int(notas.json()['RESULTADO'][notas_solicitadas[i]]['NOTA']))
-        for i, column in enumerate(columns):
-            cell = Gtk.CellRendererText()
-            col = Gtk.TreeViewColumn(column, cell, text=i)
-            tree.append_column(col)
+        for i in range(0, len(asignaturas_list)):
+            store.append([asignaturas_list[i], notas_numero_list[i]])
+        # Crear columnas si no existen
+        if not tree.get_columns():
+            columns = [
+                "Asignatura",
+                "Nota"
+                ]
+            for i, column in enumerate(columns):
+                cell = Gtk.CellRendererText()
+                col = Gtk.TreeViewColumn(column, cell, text=i)
+                tree.append_column(col)
 
         # Nota media
-        media_final = sum(nota_media) / len(nota_media)
+        media_final = sum(int (i) for i in notas_numero_list) / len(notas_numero_list)
         builder.get_object("notas_media").set_markup("Tu nota media es de " + str(round(media_final, 2)))
-        notas_menu.show()
+        builder.get_object("notas_evaluacion_menu").show()
 
     # Actividades evaluables
     def on_act_eval_clicked(self, button):
         builder.get_object("actividades_eval_menu").show()
     def on_continuar_acteval_boton_clicked(self,button):
         # TODO, completar
+        act_menu = builder.get_object("act_evaluacion_menu")
         act_evaluacion = builder.get_object("activiadescombo").get_active_text()
         api.convcentro(act_evaluacion)
-        act_menu = builder.get_object("act_evaluacion_menu")
-        act_grid = builder.get_object("act_grid")
         acteval = api.actividadesevaluables()
 
     # Avisos
@@ -88,7 +88,8 @@ class Handler:
         else:
             builder.get_object("avisos_label").set_markup(avisos.json()['RESULTADO'][0]['D_AVISO']) # A veces puede fallar, investigando mejores métodos
         builder.get_object("avisos").show()
-        # TODO, completar
+    def on_avisos_ok_clicked(self, button):
+        builder.get_object("avisos").hide()
 
     # Conductas contrarias
     def on_conductas_clicked(self, button):
@@ -103,22 +104,23 @@ class Handler:
 
     # Observaciones del alumnado
     def on_observaciones_clicked(self, button):
-        columns = [
-            "Asignatura",
-            "Mensaje"
-        ]
         observaciones = api.observaciones()
         tree = builder.get_object("observaciones_treeview")
         store = builder.get_object("observaciones_store")
-
         # Necesario para que no se reincluye al volver a entrar
         store.clear()
         for i in range(0, len(observaciones.json()['RESULTADO'])):
             store.append([observaciones.json()['RESULTADO'][i]['D_MATERIAC'],observaciones.json()['RESULTADO'][i]['T_OBSMATERIA']])
-        for i, column in enumerate(columns):
-            cell = Gtk.CellRendererText()
-            col = Gtk.TreeViewColumn(column, cell, text=i)
-            tree.append_column(col)
+
+        if not tree.get_columns():
+            columns = [
+                "Asignatura",
+                "Mensaje"
+                ]
+            for i, column in enumerate(columns):
+                cell = Gtk.CellRendererText()
+                col = Gtk.TreeViewColumn(column, cell, text=i)
+                tree.append_column(col)
 
         builder.get_object("observaciones_menu").show()
     # -- Header menú principal -- #
@@ -152,18 +154,17 @@ common.init()
 api.init()
 start = common.getsession()
 
-if (start == "main_menu"):
-    api.checksession()
-    global user
-    user = api.userinfo() # Consigue la información básica del usuario
-
 # Start GTK builder
 builder = Gtk.Builder()
 builder.add_from_file("assets/glade/openpasen.glade")
 builder.connect_signals(Handler())
 
-# Establece imagen del usuario, quizás hay una mejor forma de hacer esto
-builder.get_object("bienvenido_img").set_from_file(common.config_path + "imagen.png")
+if (start == "main_menu"):
+    api.checksession()
+    global user
+    user = api.userinfo() # Consigue la información básica del usuario
+    # Establece imagen del usuario, quizás hay una mejor forma de hacer esto
+    builder.get_object("bienvenido_img").set_from_file(common.config_path + "imagen.png")
 
 builder.get_object(str(start)).show()
 Gtk.main()

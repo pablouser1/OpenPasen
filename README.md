@@ -14,15 +14,11 @@ Una vez instaladas todas las librerías necesarias, inicia el programa openpytho
 
 Queda por implementar las siguientes funciones:
 
-https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getComunicaciones (Comunicaciones profe <-> alumno) | GET
+https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/getComunicaciones (Comunicaciones profe <-> alumno) | GET
 
-https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/getActividadesEvaluables (Actividades evaluables) | POST
+https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/getActividadesEvaluables (Actividades evaluables) | POST
 
-https://www.juntadeandalucia.es/educacion/seneca/seneca/jsp/pasendroid/avisos (Avisos) | GET (Está implementada pero a veces falla)
-
-Fallback para fallos de conexión
-
-setup.py / Instalador
+https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/avisos (Avisos) | GET (Está implementada pero a veces falla)
 
 Comprobar compatibilidad con Windows y Mac
 
