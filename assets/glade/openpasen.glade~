@@ -29,7 +29,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">OpenPasen</property>
-    <property name="version">1.2.5</property>
+    <property name="version">1.2.6</property>
     <property name="comments" translatable="yes">Cliente open-source hecho en Python del programa de seguimiento escolar de la Junta de Andalucía.</property>
     <property name="website">https://github.com/pablouser1/OpenPasen</property>
     <property name="artists">Mark (grade.png) icon made by Prosymbols from www.flaticon.com
@@ -69,7 +69,7 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
     <property name="can_focus">False</property>
     <property name="pixbuf">../img/acteval.png</property>
   </object>
-  <object class="GtkWindow" id="actividades_eval_menu">
+  <object class="GtkWindow" id="actividades_menu">
     <property name="can_focus">False</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
@@ -79,10 +79,10 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
         <property name="orientation">vertical</property>
         <property name="spacing">10</property>
         <child>
-          <object class="GtkLabel">
+          <object class="GtkLabel" id="actividades_info">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Elige la evaluación:</property>
+            <property name="label" translatable="yes">Asignaturas y evaluación</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -91,14 +91,91 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
           </packing>
         </child>
         <child>
-          <object class="GtkComboBoxText" id="actevalcombo">
+          <object class="GtkComboBoxText" id="actividades_asignaturas">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="active">0</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="actividades_evaluaciones">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="active">0</property>
             <items>
-              <item id="0">1ª Evaluación</item>
-              <item id="1">2ª Evaluación</item>
-              <item id="2">3ª Evaluación</item>
+              <item id="0" translatable="yes">1ª Evaluación</item>
+              <item id="1" translatable="yes">2ª Evaluación</item>
+              <item id="2" translatable="yes">3ª Evaluación</item>
             </items>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="actividades_continuar">
+            <property name="label" translatable="yes">Continuar</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_actividades_continuar_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+  </object>
+  <object class="GtkListStore" id="actividades_store">
+    <columns>
+      <!-- column-name Tema -->
+      <column type="gchararray"/>
+      <!-- column-name Nota -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkWindow" id="act_eval_menu">
+    <property name="can_focus">False</property>
+    <signal name="delete-event" handler="delete_event" swapped="no"/>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">10</property>
+        <child>
+          <object class="GtkLabel" id="actividades_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkTreeView" id="actividades_treeview">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="model">actividades_store</property>
+            <property name="search_column">0</property>
+            <child internal-child="selection">
+              <object class="GtkTreeSelection"/>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -108,20 +185,6 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
         </child>
         <child>
           <placeholder/>
-        </child>
-        <child>
-          <object class="GtkButton" id="continuar_acteval_boton">
-            <property name="label" translatable="yes">Continuar</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <signal name="clicked" handler="on_continuar_acteval_boton_clicked" swapped="no"/>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">3</property>
-          </packing>
         </child>
       </object>
     </child>
@@ -461,6 +524,7 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
               <item id="0">1ª Evaluación</item>
               <item id="1">2ª Evaluación</item>
               <item id="2">3ª Evaluación</item>
+              <item id="3" translatable="yes">Ordinaria</item>
             </items>
           </object>
           <packing>
@@ -484,14 +548,14 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
           </packing>
         </child>
         <child>
-          <object class="GtkSpinner" id="notas_spinner">
+          <object class="GtkLabel" id="notas_info">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">4</property>
+            <property name="position">3</property>
           </packing>
         </child>
       </object>
@@ -513,7 +577,7 @@ Conductas contrarias (conductacontaria.png) icons made by Freepik from www.flati
     <property name="destroy_with_parent">True</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="notas_box">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>

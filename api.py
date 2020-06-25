@@ -17,20 +17,24 @@ def req(method, url, body = "null"):
     try:
         if (method == "GET"):
             if (body == "null"):
-                data = requests.get(url, headers=headers, cookies=jar, timeout=3)
+                data = requests.get(url, headers=headers, cookies=jar, timeout=5)
             else:
-                data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=3)
+                data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=5)
         if (method == "POST"):
             if (body == "null"):
-                data = requests.post(url, headers=headerspost, cookies=jar, timeout=3)
+                data = requests.post(url, headers=headerspost, cookies=jar, timeout=5)
             else:
-                data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=3)
+                data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=5)
+        
+        # Si el servidor devuelve un error hacer una exception
+        if (data.json()['ESTADO']['CODIGO'] == "E"):
+            raise Exception(data.json()['ESTADO']['DESCRIPCION'])
         return data
     
     # Timeout
-    except requests.exceptions.RequestException:
-        print("Error de conexión")
-        quit(1)
+    except requests.exceptions.RequestException as e:
+        print(f'Error de conexión, {e}')
+        quit(1)  # TODO, administrar mejor los errores
 
 # Initial variables
 headers = {
@@ -114,7 +118,7 @@ def userinfo():
         foto_local = open(common.config_path + "imagen.png", 'rb')
         print("Imagen encontrada")
     except IOError:
-        print("Foto no encontrada")
+        print("Foto no encontrada, descargando...")
         # Si no existe lo descarga
         bodyfoto = "X_MATRICULA=" + user["matricula"]
         foto_req = requests.post(base_url + "imageAlumno", headers=headerspost, cookies=jar, data=bodyfoto, stream=True, timeout=3)
@@ -129,8 +133,7 @@ def userinfo():
 def convcentro(evaluacion):
     bodyconv = "X_MATRICULA=" + user["matricula"]
     convocatorias = req("POST", base_url + "getConvocatorias", bodyconv)
-    cantidad_convocatorias = len(convocatorias.json()['RESULTADO'])
-    for i in range(0, cantidad_convocatorias):
+    for i in range(0, len(convocatorias.json()['RESULTADO'])):
         if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == evaluacion):
             return convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']
 
@@ -145,10 +148,29 @@ def getNotas(convcentro, notas_evaluacion):
     
     return asignaturas_list, notas_numero_list
 
-def actividadesevaluables():
-    bodyevaluacones = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(user["convcentro"])
+def getMateriasMatricula():
+    bodymaterias = "X_MATRICULA=" + user["matricula"]
+    matmatricula = req("POST", base_url + "getMateriasMatricula", bodymaterias)
+    materias = []
+    for i in range (0, len(matmatricula.json()['RESULTADO'])):
+        materias.append(matmatricula.json()['RESULTADO'][i]['D_MATERIAC'])
+    return materias
+
+def actividadesevaluables(convcentro, asignatura):
+    # Antes de empezar, necesitamos saber las asignaturas
+    bodyevaluacones = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(convcentro)
     acteval = req("POST", base_url + "getActividadesEvaluables", bodyevaluacones)
-    return acteval
+    tema_list = []
+    nota_list = []
+    for i in range(0,len(acteval.json()['RESULTADO'])):
+        if (acteval.json()['RESULTADO'][i]['D_MATERIAC'] == asignatura):
+            tema_list.append(acteval.json()['RESULTADO'][i]['D_ACTEVA'])
+            nota_list.append(acteval.json()['RESULTADO'][i]['N_NOTA'])
+        elif (asignatura == "Todas"):
+            tema_list.append(acteval.json()['RESULTADO'][i]['D_ACTEVA'])
+            nota_list.append(acteval.json()['RESULTADO'][i]['N_NOTA'])
+
+    return tema_list, nota_list
 
 def avisos():
     avisos = req("GET", base_url + "avisos")
@@ -163,7 +185,12 @@ def conductas():
 def observaciones():
     body_obs = "X_MATRICULA=" + user["matricula"]
     observaciones = req("POST", base_url + "getObservaciones", body_obs)
-    return observaciones
+    observaciones_asignaturas = []
+    observaciones_mensajes = []
+    for i in range(0,len(observaciones.json()['RESULTADO'])):
+        observaciones_asignaturas.append(observaciones.json()['RESULTADO'][i]['D_MATERIAC'])
+        observaciones_mensajes.append(observaciones.json()['RESULTADO'][i]['T_OBSMATERIA'])
+    return observaciones_asignaturas, observaciones_mensajes
 
 def centro():
     body = "X_CENTRO=" + user["centro"]
