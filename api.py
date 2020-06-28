@@ -17,14 +17,14 @@ def req(method, url, body = "null"):
     try:
         if (method == "GET"):
             if (body == "null"):
-                data = requests.get(url, headers=headers, cookies=jar, timeout=5)
+                data = requests.get(url, headers=headers, cookies=jar, timeout=5, verify=False)
             else:
-                data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=5)
+                data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=5, verify=False)
         if (method == "POST"):
             if (body == "null"):
-                data = requests.post(url, headers=headerspost, cookies=jar, timeout=5)
+                data = requests.post(url, headers=headerspost, cookies=jar, timeout=5, verify=False)
             else:
-                data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=5)
+                data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=5, verify=False)
         
         # Si el servidor devuelve un error hacer una exception
         if (data.json()['ESTADO']['CODIGO'] == "E"):
@@ -50,8 +50,8 @@ base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/" # Este es
 def login(logininfo):
     # (logininfo): 0 = Username | 1 = Password | 2 = Remember me
 
-    body = 'USUARIO=' + logininfo[0] + '&CLAVE=' + logininfo[1] + '&p={"version":"11.10.0"}'
-    login = requests.post(base_url + "login", headers=headerspost, data=body)
+    body = 'USUARIO=' + logininfo[0] + '&CLAVE=' + logininfo[1] + '&p={"version":"11.10.2"}'
+    login = req("POST", base_url + "login", body)
     # Comprobando si se ha iniciado sesión correctamente
     if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
         print("Error al iniciar sesión")
@@ -82,7 +82,7 @@ def checksession():
         print("Sesión ok")
     except KeyError:
         print("Las cookies han expirado, generando nuevas...")
-        body = 'USUARIO=' + config['Login']['Username'] + '&CLAVE=' + config['Login']['Password'] + '&p={"version":"11.10.0"}'
+        body = 'USUARIO=' + config['Login']['Username'] + '&CLAVE=' + config['Login']['Password'] + '&p={"version":"11.10.2"}'
         login = req("POST", base_url + "login", body)
         if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
             print("Error al iniciar sesión")
@@ -121,7 +121,7 @@ def userinfo():
         print("Foto no encontrada, descargando...")
         # Si no existe lo descarga
         bodyfoto = "X_MATRICULA=" + user["matricula"]
-        foto_req = requests.post(base_url + "imageAlumno", headers=headerspost, cookies=jar, data=bodyfoto, stream=True, timeout=3)
+        foto_req = requests.post(base_url + "imageAlumno", headers=headerspost, cookies=jar, data=bodyfoto, stream=True, timeout=3, verify=False)
         # Guarda el archivo localmente
         foto_local = open(common.config_path + "imagen.png", 'wb')
         foto_req.raw.decode_content = True
@@ -191,6 +191,41 @@ def observaciones():
         observaciones_asignaturas.append(observaciones.json()['RESULTADO'][i]['D_MATERIAC'])
         observaciones_mensajes.append(observaciones.json()['RESULTADO'][i]['T_OBSMATERIA'])
     return observaciones_asignaturas, observaciones_mensajes
+
+def horario():
+    body_horario = "X_MATRICULA=" + user["matricula"]
+    horario = req("POST", base_url + "getHorario", body_horario)
+    horario_dict = {
+        "Lunes": [],
+        "Martes": [],
+        "Miercoles": [],
+        "Jueves": [],
+        "Viernes": [],
+    }
+    for i in range(0, len(horario.json()['RESULTADO'])):
+        # Elimina todo lo que va después del paréntesis (para que quepa en la tabla)
+        final = horario.json()['RESULTADO'][i]['PROF'].split("(", 1)[0]
+        dia = horario.json()['RESULTADO'][i]['DIA']
+        horario_dict[dia].append(final)
+    
+    return horario_dict
+
+def faltas():
+    body_faltas = "X_MATRICULA=" + user["matricula"]
+    faltas_req = req("POST", base_url + "getFaltas", body_faltas)
+    faltas = {
+        "Asignaturas": [],
+        "Fechas": [],
+        "Horas": [],
+        "Justificada": []
+    }
+    for i in range(0, len(faltas_req.json()['RESULTADO'])):
+        faltas["Asignaturas"].append(faltas_req.json()['RESULTADO'][i]['D_MATERIAC'])
+        faltas["Fechas"].append(faltas_req.json()['RESULTADO'][i]['F_FALASI'])
+        faltas["Horas"].append(faltas_req.json()['RESULTADO'][i]['TRAMO'])
+        faltas["Justificada"].append(faltas_req.json()['RESULTADO'][i]['TIPFAL'])
+
+    return faltas
 
 def centro():
     body = "X_CENTRO=" + user["centro"]

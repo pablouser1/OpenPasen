@@ -2,7 +2,7 @@
 
 Esta es una implementación open-source distribuida bajo la licencia GPLv3 del programa de seguimiento escolar PASEN.
 
-Utiliza Python 3, Glade, y las librerías requests, configparser y GTK 3.
+Utiliza Python 3, Glade, y las librerías requests, configparser y GTK 3. Opcionalmente requiere BeautifulSoup para generar los reportes.
 
 Actualmente testeado usando una cuenta de PASEN de alumno y usando el sistema operativo GNU/Linux.
 
@@ -16,11 +16,11 @@ Queda por implementar las siguientes funciones:
 
 https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/getComunicaciones (Comunicaciones profe <-> alumno) | GET
 
-https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/getActividadesEvaluables (Actividades evaluables) | POST
-
 https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/avisos (Avisos) | GET (Está implementada pero a veces falla)
 
 Comprobar compatibilidad con Windows y Mac
+
+Optimización
 
 # Cómo contribuir
 

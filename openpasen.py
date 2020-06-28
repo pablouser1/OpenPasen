@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import common
 import api
+import reporte
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
@@ -94,6 +95,7 @@ class Handler:
         builder.get_object("actividades_menu").show()
 
     def on_actividades_continuar_clicked(self, button):
+        # TODO, optimizar
         # Por algún motivo, esto es necesario para que al cerrar y volver a abrir se pueda ver el treeview
         actividades_menu = builder.get_object("act_eval_menu")
         actividades_box = builder.get_object("actividades_box")
@@ -169,9 +171,51 @@ class Handler:
                 tree.append_column(col)
 
         builder.get_object("observaciones_menu").show()
+
+    def on_horario_clicked(self, button):
+        tree = builder.get_object("horario_treeview")
+        store = builder.get_object("horario_store")
+        store.clear()
+        horario_dict = api.horario()
+        for i in range(0, 6):
+            store.append([horario_dict["Lunes"][i], horario_dict["Martes"][i], horario_dict["Miercoles"][i], horario_dict["Jueves"][i], horario_dict["Viernes"][i]])
+
+        if not tree.get_columns():
+            columns = [
+                "Lunes",
+                "Martes",
+                "Miércoles",
+                "Jueves",
+                "Viernes"
+                ]
+            cell = Gtk.CellRendererText()
+            for i, column in enumerate(columns):
+                col = Gtk.TreeViewColumn(column, cell, text=i)
+                tree.append_column(col)
+        builder.get_object("horario_menu").show()
+    
+    def on_faltas_clicked(self,button):
+        tree = builder.get_object("faltas_treeview")
+        store = builder.get_object("faltas_store")
+        store.clear()
+        faltas = api.faltas()
+        for i in range(0, len(faltas["Asignaturas"])):
+            store.append([faltas["Asignaturas"][i], f'{faltas["Fechas"][i]}, {faltas["Horas"][i]}', faltas["Justificada"][i]])
+
+        if not tree.get_columns():
+            columns = [
+                "Asignaturas",
+                "Fecha/Hora",
+                "Justificada"
+                ]
+            cell = Gtk.CellRendererText()
+            for i, column in enumerate(columns):
+                col = Gtk.TreeViewColumn(column, cell, text=i)
+                tree.append_column(col)
+        builder.get_object("faltas_menu").show()
     # -- Header menú principal -- #
     # Acerca de
-    def on_ayuda_clicked(self, button):
+    def on_acercade_activate(self, button):
         builder.get_object("about").show()
 
     # Perfil
@@ -188,7 +232,17 @@ class Handler:
         print(centro.text)
         builder.get_object("centro_menu").show()
         # TODO, completar
-
+    
+    def on_reporte_activate(self, button):
+        builder.get_object("reporte_menu").show()
+    
+    def on_reporte_continuar_clicked(self,button):
+        seleccion = builder.get_object("reporte_evaluaciones").get_active_text()
+        out = reporte.generar(seleccion)
+        if out not in "ImportError":
+            builder.get_object("reporte_label").set_markup(f'Se ha generado el reporte en el directorio:\n{out}')
+        else:
+            builder.get_object("reporte_label").set_markup("Ha habido un error al generar el reporte")
     # Cerrar sesión
     def on_cerrarsesion_activate(self,button):
         api.cerrarsesion()

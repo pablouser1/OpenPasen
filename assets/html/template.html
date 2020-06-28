@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+</head>
+
+<body>
+    <section class="hero is-primary is-bold">
+        <div class="hero-body has-text-centered">
+            <figure class="image container is-64x64"><img id="foto" alt="Foto Alumno" src=""></figure>
+            <br>
+            <div class="container">
+                <h1 id="alumno" class="title">
+                    Alumno
+                </h1>
+                <h2 id="curso_centro" class="subtitle">
+                    Curso, Centro
+                </h2>
+            </div>
+        </div>
+    </section>
+    <section class="section">
+        <div class="columns is-centered">
+            <div class="column is-narrow">
+                <h2 class="title">Información del curso</h2>
+            </div>
+            <div class="column is-narrow">
+                <h2 id="alumno" class="title">Notas</h2>
+                <table class="table is-bordered is-striped is-narrow is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>Asignatura</th>
+                            <th>Nota</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notas">
+                        <!-- Aquí se escribirán los datos disponibles respecto a las notas -->
+                    </tbody>
+                </table>
+                <div id="nota_media">
+                    Nota media
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <div class="has-text-centered">
+            Hecho con <span style="color: #e25555;">&#9829;</span> en Github
+            <br>
+            <figure class="image container is-128x128"><img id="qr" alt="Código QR" src=""></figure>
+        </div>
+    </footer>
+</body>
