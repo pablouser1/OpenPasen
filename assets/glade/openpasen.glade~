@@ -407,7 +407,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Salir</property>
         <property name="use_underline">True</property>
-        <signal name="activate" handler="gtk_main_quit" swapped="no"/>
+        <signal name="activate" handler="onDestroy" swapped="no"/>
       </object>
     </child>
   </object>

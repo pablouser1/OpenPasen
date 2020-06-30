@@ -54,28 +54,25 @@ class Handler:
         notas_evaluacion = builder.get_object("notascombo").get_active_text()
         convcentro = api.convcentro(notas_evaluacion)
         # Asignaturas_list tiene los nombres de las asignaturas mientras que notas_numero_list tiene la nota numérica.
-        asignaturas_list, notas_numero_list = api.getNotas(convcentro, notas_evaluacion)
+        notas = api.getNotas(convcentro, notas_evaluacion)
         # Si no hay notas disponibles, avisar y no continuar, ya que tendríamos una ZeroDivisionError
-        if (notas_numero_list == []):
+        if (notas["notas_num"] == []):
             builder.get_object("notas_info").set_markup(f'{notas_evaluacion} no tiene notas disponibles')
         else:
             tree = builder.get_object("notas_treeview")
             store = builder.get_object("notas_store")
             store.clear()
-            for i in range(0, len(asignaturas_list)):
-                store.append([asignaturas_list[i], notas_numero_list[i]])
+            for i in range(0, len(notas["asignaturas"])):
+                store.append([notas["asignaturas"][i], notas["notas_num"][i]])
             # Crear columnas si no existen
             if not tree.get_columns():
-                columns = [
-                    "Asignatura",
-                    "Nota"
-                    ]
+                columns = ["Asignatura", "Nota"]
                 cell = Gtk.CellRendererText()
                 for i, column in enumerate(columns):
                     col = Gtk.TreeViewColumn(column, cell, text=i)
                     tree.append_column(col)
             # Nota media
-            media_final = sum(int (i) for i in notas_numero_list) / len(notas_numero_list)
+            media_final = sum(int (i) for i in notas["notas_num"]) / len(notas["notas_num"])
             builder.get_object("notas_media").set_markup(f'Tu nota media es de {str(round(media_final, 2))}')
             notas_menu.show()
 
@@ -105,20 +102,17 @@ class Handler:
         actividades_asignatura = builder.get_object("actividades_asignaturas").get_active_text()
         actividades_evaluacion = builder.get_object("actividades_evaluaciones").get_active_text()
         convcentro = api.convcentro(actividades_evaluacion)
-        tema_list, nota_list = api.actividadesevaluables(convcentro, actividades_asignatura)
+        acteval = api.actividadesevaluables(convcentro, actividades_asignatura)
 
         tree = builder.get_object("actividades_treeview")
         store = builder.get_object("actividades_store")
         store.clear()
-        for i in range(0, len(tema_list)):
-            store.append([tema_list[i], nota_list[i]])
+        for i in range(0, len(acteval["tema"])):
+            store.append([acteval["tema"][i], acteval["nota"][i]])
         # Crear columnas si no existen
         if not tree.get_columns():
             print("Creando columnas...")
-            columns = [
-                "Tema",
-                "Nota"
-                ]
+            columns = ["Tema", "Nota"]
             cell = Gtk.CellRendererText()
             for i, column in enumerate(columns):
                 col = Gtk.TreeViewColumn(column, cell, text=i)
@@ -161,10 +155,7 @@ class Handler:
             store.append([observaciones_asignaturas[i],observaciones_mensajes[i]])
 
         if not tree.get_columns():
-            columns = [
-                "Asignatura",
-                "Mensaje"
-                ]
+            columns = ["Asignatura", "Mensaje"]
             cell = Gtk.CellRendererText()
             for i, column in enumerate(columns):
                 col = Gtk.TreeViewColumn(column, cell, text=i)
@@ -181,13 +172,7 @@ class Handler:
             store.append([horario_dict["Lunes"][i], horario_dict["Martes"][i], horario_dict["Miercoles"][i], horario_dict["Jueves"][i], horario_dict["Viernes"][i]])
 
         if not tree.get_columns():
-            columns = [
-                "Lunes",
-                "Martes",
-                "Miércoles",
-                "Jueves",
-                "Viernes"
-                ]
+            columns = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
             cell = Gtk.CellRendererText()
             for i, column in enumerate(columns):
                 col = Gtk.TreeViewColumn(column, cell, text=i)
@@ -203,11 +188,7 @@ class Handler:
             store.append([faltas["Asignaturas"][i], f'{faltas["Fechas"][i]}, {faltas["Horas"][i]}', faltas["Justificada"][i]])
 
         if not tree.get_columns():
-            columns = [
-                "Asignaturas",
-                "Fecha/Hora",
-                "Justificada"
-                ]
+            columns = ["Asignaturas", "Fecha/Hora", "Justificada"]
             cell = Gtk.CellRendererText()
             for i, column in enumerate(columns):
                 col = Gtk.TreeViewColumn(column, cell, text=i)

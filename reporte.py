@@ -3,6 +3,7 @@
 import common
 import api
 import os
+from shutil import copyfile
 reportError = False
 path = os.path.dirname(os.path.realpath(__file__))
 try:
@@ -34,20 +35,19 @@ def basic():
     }
 def notas(seleccion):
     convcentro = api.convcentro(seleccion)
-    asignaturas_list, notas_numero_list = api.getNotas(convcentro, seleccion)
+    notas = api.getNotas(convcentro, seleccion)
     reporte["notas"] = {
         "asignaturas": [],
         "notas": []
     }
-    for i in range(0,len(asignaturas_list)):
-        reporte["notas"]["asignaturas"].append(asignaturas_list[i])
-        reporte["notas"]["notas"].append(notas_numero_list[i])
+    for i in range(0,len(notas["asignaturas"])):
+        reporte["notas"]["asignaturas"].append(notas["asignaturas"][i])
+        reporte["notas"]["notas"].append(notas["notas_num"][i])
 
 def html():
     soup.find(id='alumno').string.replace_with(reporte["basicinfo"]["nombre"])
     soup.find(id='curso_centro').string.replace_with(f'{reporte["basicinfo"]["unidad"]} / {reporte["basicinfo"]["centro"]}')
     soup.find(id='foto')["src"] = f'{common.config_path}imagen.png'
-    soup.find(id="qr")["src"] = f'{path}/assets/img/qr-code.png'
     # Tabla notas
     notas = soup.find(id='notas')
     for i in range(0, len(reporte["notas"]["asignaturas"])):
@@ -66,7 +66,12 @@ def html():
     
     # Registrar sólo en NOMBRE
     nombre_split = reporte["basicinfo"]["nombre"].split(", ",1)[1]
-    out = f'{common.config_path}reporte_{nombre_split}.html'
+    try:
+        os.mkdir(f'{common.config_path}{nombre_split}')
+    except FileExistsError:
+        pass
+    out = f'{common.config_path}{nombre_split}/reporte.html'
+    copyfile('assets/img/qr-code.png', f'{common.config_path}{nombre_split}/qr-code.png')
     # Escribe el html
     with open(out, "wb") as f_output:
         f_output.write(soup.prettify("utf-8"))

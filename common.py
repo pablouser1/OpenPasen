@@ -11,13 +11,17 @@ def init():
     jar = requests.cookies.RequestsCookieJar()
     global config
     config = configparser.ConfigParser()
-    # TODO, configuración exclusiva de Linux
+    # TODO incluir Mac (darwin)
     global config_path
-    config_path = str(Path.home()) + "/.config/openpasen/" # Localización de la configuración
+    if os.name in "posix":
+        config_path = str(Path.home()) + "/.config/openpasen/" # Localización en linux
+    
+    elif os.name in "nt":
+        config_path = str(Path.home()) + "/AppData/Roaming/OpenPasen/" # Localización en Windows
 
 def getsession():
     try:
-        os.mkdir(str(Path.home()) + "/.config/openpasen")
+        os.mkdir(config_path)
         print("Configuración no encontrada, creando...")
     except FileExistsError:
         print("Configuración encontrada")

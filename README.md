@@ -1,27 +1,55 @@
 # OpenPasen
 
-Esta es una implementación open-source distribuida bajo la licencia GPLv3 del programa de seguimiento escolar PASEN.
+Esta es una implementación open-source distribuida bajo la licencia GPLv3 del programa de seguimiento escolar PASEN hecha en Python.
 
-Utiliza Python 3, Glade, y las librerías requests, configparser y GTK 3. Opcionalmente requiere BeautifulSoup para generar los reportes.
-
-Actualmente testeado usando una cuenta de PASEN de alumno y usando el sistema operativo GNU/Linux.
+Actualmente testeado usando una cuenta de PASEN de alumno usando Linux, de momento no funciona con las cuentas de profesores y padres.
 
 # Cómo usar
 
-Una vez instaladas todas las librerías necesarias, inicia el programa openpython.py.
+#### Windows:
+
+Puedes encontrar el instalador en la sección de "releases" o en scripts/Output/openpasen_win64.exe.
+
+También puedes instalar python junto con las librerías necesarias y ejecutar el archivo "openpython.py". Este proceso es algo más complicado.
+
+#### Mac:
+
+WIP
+
+#### Linux:
+
+Necesitas instalar las dependencias: Python 3, Glade, y las librerías requests, configparser y GTK 3.
+
+Opcionalmente requiere BeautifulSoup para generar los reportes. Cuando tengas las dependencias puedes empezar ejecutando el archivo "openpython.py".
 
 # TODO
 
-Queda por implementar las siguientes funciones:
+#### General:
 
 https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/getComunicaciones (Comunicaciones profe <-> alumno) | GET
 
 https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/avisos (Avisos) | GET (Está implementada pero a veces falla)
 
-Comprobar compatibilidad con Windows y Mac
+https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/getConductasContrarias (Conductas contrarias) | POST (Incompleta)
 
 Optimización
 
+Mejorar diseño
+
+Limpieza de código
+
+#### Windows:
+
+Mejorar tamaño (librerías de sobra)
+
+Bug, Imagen del usuario de 0 bytes
+
+Problema con caracteres UTF-8 como ñ, á...
+
+#### Mac:
+
+Incluir soporte
+
 # Cómo contribuir
 
-Este programa utiliza el sistema de APIs de la aplicación de móvil de iPasen de Android. Para poder ver lo que está haciendo puedes conectar tu teléfono al ordenador y usando adb logcat puedes ver las conexiones que hace tu teléfono a los servidores de la Junta de Andalucía. Con esta información te será más fácil contribuir al código.
+Este programa utiliza la API de iPASEN, las solicitudes al servidor necesarias se pueden obtener a través de logcat. Cualquiera contribución es bienvenida.

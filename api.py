@@ -16,16 +16,9 @@ def init():
 def req(method, url, body = "null"):
     try:
         if (method == "GET"):
-            if (body == "null"):
-                data = requests.get(url, headers=headers, cookies=jar, timeout=5, verify=False)
-            else:
-                data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=5, verify=False)
+            data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=5, verify=False)
         if (method == "POST"):
-            if (body == "null"):
-                data = requests.post(url, headers=headerspost, cookies=jar, timeout=5, verify=False)
-            else:
-                data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=5, verify=False)
-        
+            data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=5, verify=False)
         # Si el servidor devuelve un error hacer una exception
         if (data.json()['ESTADO']['CODIGO'] == "E"):
             raise Exception(data.json()['ESTADO']['DESCRIPCION'])
@@ -139,14 +132,16 @@ def convcentro(evaluacion):
 
 def getNotas(convcentro, notas_evaluacion):
     bodynotas = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(convcentro)
-    notas = req("POST", base_url + "getNotas", bodynotas)
-    asignaturas_list = []
-    notas_numero_list = []
-    for i in range(0,len(notas.json()['RESULTADO'])):
-        asignaturas_list.append(notas.json()['RESULTADO'][i]['D_MATERIA'])
-        notas_numero_list.append(notas.json()['RESULTADO'][i]['NOTA'])
+    notas_req = req("POST", base_url + "getNotas", bodynotas).json()
+    notas = {
+        "asignaturas": [],
+        "notas_num": []
+    }
+    for i in range(0,len(notas_req['RESULTADO'])):
+        notas["asignaturas"].append(notas_req['RESULTADO'][i]['D_MATERIA'])
+        notas["notas_num"].append(notas_req['RESULTADO'][i]['NOTA'])
     
-    return asignaturas_list, notas_numero_list
+    return notas
 
 def getMateriasMatricula():
     bodymaterias = "X_MATRICULA=" + user["matricula"]
@@ -159,18 +154,20 @@ def getMateriasMatricula():
 def actividadesevaluables(convcentro, asignatura):
     # Antes de empezar, necesitamos saber las asignaturas
     bodyevaluacones = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(convcentro)
-    acteval = req("POST", base_url + "getActividadesEvaluables", bodyevaluacones)
-    tema_list = []
-    nota_list = []
-    for i in range(0,len(acteval.json()['RESULTADO'])):
-        if (acteval.json()['RESULTADO'][i]['D_MATERIAC'] == asignatura):
-            tema_list.append(acteval.json()['RESULTADO'][i]['D_ACTEVA'])
-            nota_list.append(acteval.json()['RESULTADO'][i]['N_NOTA'])
-        elif (asignatura == "Todas"):
-            tema_list.append(acteval.json()['RESULTADO'][i]['D_ACTEVA'])
-            nota_list.append(acteval.json()['RESULTADO'][i]['N_NOTA'])
+    acteval_req = req("POST", base_url + "getActividadesEvaluables", bodyevaluacones).json()
+    acteval = {
+        "tema": [],
+        "nota": []
+    }
+    for i in range(0,len(acteval_req['RESULTADO'])):
+        if (asignatura == "Todas"):
+            acteval["tema"].append(acteval_req['RESULTADO'][i]['D_ACTEVA'])
+            acteval["nota"].append(acteval_req['RESULTADO'][i]['N_NOTA'])
+        elif (acteval_req['RESULTADO'][i]['D_MATERIAC'] == asignatura):
+            acteval["tema"].append(acteval_req['RESULTADO'][i]['D_ACTEVA'])
+            acteval["nota"].append(acteval_req['RESULTADO'][i]['N_NOTA'])
 
-    return tema_list, nota_list
+    return acteval
 
 def avisos():
     avisos = req("GET", base_url + "avisos")
