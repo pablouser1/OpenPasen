@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import configparser
 import requests
 import api
-import os
+from os import mkdir as mkdir
+import platform
 from pathlib import Path
 def init():
     # Variables globales, se usarán a lo largo de todo el programa
@@ -13,18 +14,21 @@ def init():
     config = configparser.ConfigParser()
     # TODO incluir Mac (darwin)
     global config_path
-    if os.name in "posix":
+    if platform.system() in "Linux":
         config_path = str(Path.home()) + "/.config/openpasen/" # Localización en linux
     
-    elif os.name in "nt":
+    elif platform.system() in "Windows":
         config_path = str(Path.home()) + "/AppData/Roaming/OpenPasen/" # Localización en Windows
+    
+    elif platform.system() in "Darwin":
+        config_path = str(Path.home()) + "/Library/OpenPasen" # Localización en Mac
 
 def getsession():
     try:
-        os.mkdir(config_path)
-        print("Configuración no encontrada, creando...")
+        mkdir(config_path)
+        print("Config no encontrada, creando...")
     except FileExistsError:
-        print("Configuración encontrada")
+        print("Config encontrada")
     config.read(config_path + "config.ini")
     try:
         config.items('Login')

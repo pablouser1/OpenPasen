@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import common
 import requests
@@ -182,12 +182,16 @@ def conductas():
 def observaciones():
     body_obs = "X_MATRICULA=" + user["matricula"]
     observaciones = req("POST", base_url + "getObservaciones", body_obs)
-    observaciones_asignaturas = []
-    observaciones_mensajes = []
+    observaciones_dict = {
+        "Asignaturas": [],
+        "Mensajes": [],
+        "Fechas": []
+    }
     for i in range(0,len(observaciones.json()['RESULTADO'])):
-        observaciones_asignaturas.append(observaciones.json()['RESULTADO'][i]['D_MATERIAC'])
-        observaciones_mensajes.append(observaciones.json()['RESULTADO'][i]['T_OBSMATERIA'])
-    return observaciones_asignaturas, observaciones_mensajes
+        observaciones_dict["Asignaturas"].append(observaciones.json()['RESULTADO'][i]['D_MATERIAC'])
+        observaciones_dict["Mensajes"].append(observaciones.json()['RESULTADO'][i]['T_OBSMATERIA'])
+        observaciones_dict["Fechas"].append(observaciones.json()['RESULTADO'][i]['F_OBSMAT'])
+    return observaciones_dict
 
 def horario():
     body_horario = "X_MATRICULA=" + user["matricula"]
@@ -212,14 +216,12 @@ def faltas():
     faltas_req = req("POST", base_url + "getFaltas", body_faltas)
     faltas = {
         "Asignaturas": [],
-        "Fechas": [],
-        "Horas": [],
+        "Fechas y Horas": [],
         "Justificada": []
     }
     for i in range(0, len(faltas_req.json()['RESULTADO'])):
         faltas["Asignaturas"].append(faltas_req.json()['RESULTADO'][i]['D_MATERIAC'])
-        faltas["Fechas"].append(faltas_req.json()['RESULTADO'][i]['F_FALASI'])
-        faltas["Horas"].append(faltas_req.json()['RESULTADO'][i]['TRAMO'])
+        faltas["Fechas y Horas"].append(f'{faltas_req.json()["RESULTADO"][i]["F_FALASI"]}, {faltas_req.json()["RESULTADO"][i]["TRAMO"]}')
         faltas["Justificada"].append(faltas_req.json()['RESULTADO'][i]['TIPFAL'])
 
     return faltas

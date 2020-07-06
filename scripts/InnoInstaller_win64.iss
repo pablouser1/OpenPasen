@@ -4,7 +4,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OpenPasen"
-#define MyAppVersion "1.4"
+#define MyAppVersion "1.4.1"
 #define MyAppPublisher "Pablo Ferreiro"
 #define MyAppURL "https://github.com/pablouser1/OpenPasen"
 #define MyAppExeName "openpasen.exe"

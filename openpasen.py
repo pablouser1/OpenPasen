@@ -1,13 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import common
 import api
 import reporte
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk
+from notebook import Notebook as main_notebook
 
 class Handler:
+    # Init
     def __init__(self):
         print("GTK Handler Init")
     
@@ -38,12 +40,34 @@ class Handler:
         builder.get_object("main_menu").show()
     
     # -- Main menu -- #
-    # Init
     def on_main_menu_show(self, *args):
         builder.get_object("bienvenido_label").set_text(f'Bienvenido, {user["nombre"]}')
+
+    # Notebook, parte principal del programa
+    # A partir del id ejecuta distintas funciones
+    def on_main_notebook_switch_page(self,notebook, page, page_num):
+        # Actividades evaluables
+        if (page_num == 1):
+            main_notebook.actividades(self, builder)
+        # Observaciones
+        elif(page_num == 2):
+            main_notebook.observaciones(self, builder)
+        # Faltas
+        elif(page_num == 3):
+            main_notebook.faltas(self, builder)
+        # Conductas
+        elif(page_num == 4):
+            main_notebook.conductas(self, builder)
+        # Horario
+        elif(page_num == 5):
+            main_notebook.horario(self, builder)
+        # Avisos
+        elif(page_num == 6):
+            main_notebook.avisos(self, builder)
+        else:
+            pass
+
     # Notas
-    def on_notas_clicked(self,button):
-        builder.get_object("notas_menu").show()
     def on_continuar_notas_boton_clicked(self, button):
         # Por algún motivo, esto es necesario para que al cerrar y volver a abrir se pueda ver el treeview
         notas_menu = builder.get_object("notas_evaluacion_menu")
@@ -76,21 +100,6 @@ class Handler:
             builder.get_object("notas_media").set_markup(f'Tu nota media es de {str(round(media_final, 2))}')
             notas_menu.show()
 
-    # Actividades evaluables
-    def on_act_eval_clicked(self, button):
-        # Lista con asignaturas
-        actividades_asignaturas = builder.get_object("actividades_asignaturas")
-        materias = api.getMateriasMatricula()
-        materias_store = Gtk.ListStore(str)
-        materias_store.append(["Todas"])
-        for materia in materias:
-            materias_store.append([materia])
-        actividades_asignaturas.set_model(materias_store)
-        cell = Gtk.CellRendererText()
-        actividades_asignaturas.pack_start(cell, False)
-        actividades_asignaturas.set_active(0)
-        builder.get_object("actividades_menu").show()
-
     def on_actividades_continuar_clicked(self, button):
         # TODO, optimizar
         # Por algún motivo, esto es necesario para que al cerrar y volver a abrir se pueda ver el treeview
@@ -121,79 +130,6 @@ class Handler:
         builder.get_object("actividades_label").set_markup(f'{actividades_asignatura} - {actividades_evaluacion}')
         builder.get_object("act_eval_menu").show()
 
-
-    # Avisos
-    def on_avisos_boton_clicked(self, button):
-        avisos = api.avisos()
-        if (avisos.text == '{"ESTADO":{"CODIGO":"C"},"RESULTADO":[]}'):
-            builder.get_object("avisos_label").set_markup("No hay avisos disponibles")
-        else:
-            builder.get_object("avisos_label").set_markup(avisos.json()['RESULTADO'][0]['D_AVISO']) # A veces puede fallar, investigando mejores métodos
-        builder.get_object("avisos").show()
-    def on_avisos_ok_clicked(self, button):
-        builder.get_object("avisos").hide()
-
-    # Conductas contrarias
-    def on_conductas_clicked(self, button):
-        conductas = api.conductas()
-        if (conductas.text == '{"ESTADO":{"CODIGO":"C"},"RESULTADO":[]}'):
-            builder.get_object("label_conductas").set_markup("No tienes ninguna conducta contraria")
-        else:
-            builder.get_object("label_conductas").set_markup("WIP")
-
-        builder.get_object("conductas_menu").show_all()
-        # TODO, completar
-
-    # Observaciones del alumnado
-    def on_observaciones_clicked(self, button):
-        observaciones_asignaturas, observaciones_mensajes = api.observaciones()
-        tree = builder.get_object("observaciones_treeview")
-        store = builder.get_object("observaciones_store")
-        # Necesario para que no se reincluye al volver a entrar
-        store.clear()
-        for i in range(0, len(observaciones_asignaturas)):
-            store.append([observaciones_asignaturas[i],observaciones_mensajes[i]])
-
-        if not tree.get_columns():
-            columns = ["Asignatura", "Mensaje"]
-            cell = Gtk.CellRendererText()
-            for i, column in enumerate(columns):
-                col = Gtk.TreeViewColumn(column, cell, text=i)
-                tree.append_column(col)
-
-        builder.get_object("observaciones_menu").show()
-
-    def on_horario_clicked(self, button):
-        tree = builder.get_object("horario_treeview")
-        store = builder.get_object("horario_store")
-        store.clear()
-        horario_dict = api.horario()
-        for i in range(0, 6):
-            store.append([horario_dict["Lunes"][i], horario_dict["Martes"][i], horario_dict["Miercoles"][i], horario_dict["Jueves"][i], horario_dict["Viernes"][i]])
-
-        if not tree.get_columns():
-            columns = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
-            cell = Gtk.CellRendererText()
-            for i, column in enumerate(columns):
-                col = Gtk.TreeViewColumn(column, cell, text=i)
-                tree.append_column(col)
-        builder.get_object("horario_menu").show()
-    
-    def on_faltas_clicked(self,button):
-        tree = builder.get_object("faltas_treeview")
-        store = builder.get_object("faltas_store")
-        store.clear()
-        faltas = api.faltas()
-        for i in range(0, len(faltas["Asignaturas"])):
-            store.append([faltas["Asignaturas"][i], f'{faltas["Fechas"][i]}, {faltas["Horas"][i]}', faltas["Justificada"][i]])
-
-        if not tree.get_columns():
-            columns = ["Asignaturas", "Fecha/Hora", "Justificada"]
-            cell = Gtk.CellRendererText()
-            for i, column in enumerate(columns):
-                col = Gtk.TreeViewColumn(column, cell, text=i)
-                tree.append_column(col)
-        builder.get_object("faltas_menu").show()
     # -- Header menú principal -- #
     # Acerca de
     def on_acercade_activate(self, button):
@@ -230,22 +166,22 @@ class Handler:
         builder.get_object('main_menu').hide()
         builder.get_object('login_menu').show()
 
-# Initial startup
-common.init()
-api.init()
-start = common.getsession()
 
-# Start GTK builder
-builder = Gtk.Builder()
-builder.add_from_file("assets/glade/openpasen.glade")
-builder.connect_signals(Handler())
+if __name__ == "__main__":
+    # Initial startup
+    common.init()
+    api.init()
+    start = common.getsession()
+    # Start GTK builder
+    builder = Gtk.Builder()
+    builder.add_from_file("assets/glade/openpasen.glade")
+    builder.connect_signals(Handler())
+    if (start == "main_menu"):
+        api.checksession()
+        global user
+        user = api.userinfo() # Consigue la información básica del usuario
+        # Establece imagen del usuario, quizás hay una mejor forma de hacer esto
+        builder.get_object("bienvenido_img").set_from_file(f'{common.config_path}imagen.png')
 
-if (start == "main_menu"):
-    api.checksession()
-    global user
-    user = api.userinfo() # Consigue la información básica del usuario
-    # Establece imagen del usuario, quizás hay una mejor forma de hacer esto
-    builder.get_object("bienvenido_img").set_from_file(f'{common.config_path}imagen.png')
-
-builder.get_object(str(start)).show()
-Gtk.main()
+    builder.get_object(str(start)).show()
+    Gtk.main()

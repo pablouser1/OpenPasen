@@ -1,6 +1,6 @@
-# Crea los binarios .exe para Windows
-
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Crea los binarios .exe para Windows
 
 import sys
 from platform import system
@@ -10,7 +10,7 @@ from cx_Freeze import Executable, setup
 base = None
 
 build_exe_options = {
-    'excludes': ['tkinter'],
+    'excludes': ['tkinter', 'mail'],
     'include_files': ['assets', 'LICENSE'],
     'packages': ['gi'],
 }
@@ -31,9 +31,11 @@ elif system() == 'Linux':
 setup(
     name='OpenPasen',
     author='Pablo Ferreiro Romero',
-    version='1.3',
+    version='1.4.1',
     description='Programa de seguimiento escolar de la Junta de Andalucía no oficial',
-    options={'build_exe': build_exe_options},
+    options={
+        'build_exe': build_exe_options
+    },
     executables=[
         Executable(
             'openpasen.py',
