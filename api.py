@@ -16,9 +16,9 @@ def init():
 def req(method, url, body = "null"):
     try:
         if (method == "GET"):
-            data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=5, verify=False)
+            data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=5, verify="cert/juntadeandalucia-es-chain.pem")
         if (method == "POST"):
-            data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=5, verify=False)
+            data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=5, verify="cert/juntadeandalucia-es-chain.pem")
         # Si el servidor devuelve un error hacer una exception
         if (data.json()['ESTADO']['CODIGO'] == "E"):
             raise Exception(data.json()['ESTADO']['DESCRIPCION'])
@@ -43,7 +43,7 @@ base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/" # Este es
 def login(logininfo):
     # (logininfo): 0 = Username | 1 = Password | 2 = Remember me
 
-    body = 'USUARIO=' + logininfo[0] + '&CLAVE=' + logininfo[1] + '&p={"version":"11.10.2"}'
+    body = 'USUARIO=' + logininfo[0] + '&CLAVE=' + logininfo[1] + '&p={"version":"11.10.4"}'
     login = req("POST", base_url + "login", body)
     # Comprobando si se ha iniciado sesión correctamente
     if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
@@ -75,7 +75,7 @@ def checksession():
         print("Sesión ok")
     except KeyError:
         print("Las cookies han expirado, generando nuevas...")
-        body = 'USUARIO=' + config['Login']['Username'] + '&CLAVE=' + config['Login']['Password'] + '&p={"version":"11.10.2"}'
+        body = 'USUARIO=' + config['Login']['Username'] + '&CLAVE=' + config['Login']['Password'] + '&p={"version":"11.10.4"}'
         login = req("POST", base_url + "login", body)
         if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
             print("Error al iniciar sesión")
@@ -98,15 +98,26 @@ def checksession():
 def userinfo():
     main = req("GET", base_url + "infoSesion").json()
     global user
-    user = {
-        "nombre" : main['RESULTADO'][0]['USUARIO'],
-        "curso" : main['RESULTADO'][0]['MATRICULAS'][0]['CURSO'],
-        "unidad" : main['RESULTADO'][0]['MATRICULAS'][0]['UNIDAD'],
-        "denominacion" : main['RESULTADO'][0]['MATRICULAS'][0]['DENOMINACION'],
-        "tutor" : main['RESULTADO'][0]['MATRICULAS'][0]['TUTOR'],
-        "matricula" : main['RESULTADO'][0]['MATRICULAS'][0]['X_MATRICULA'],
-        "centro" : main['RESULTADO'][0]['MATRICULAS'][0]['X_CENTRO'],
+    if (main['RESULTADO'][0]["C_PERFIL"] == "ALU"):
+        # Usuario es alumno
+        user = {
+            "nombre" : main['RESULTADO'][0]['USUARIO'],
+            "curso" : main['RESULTADO'][0]['MATRICULAS'][0]['CURSO'],
+            "unidad" : main['RESULTADO'][0]['MATRICULAS'][0]['UNIDAD'],
+            "denominacion" : main['RESULTADO'][0]['MATRICULAS'][0]['DENOMINACION'],
+            "tutor" : main['RESULTADO'][0]['MATRICULAS'][0]['TUTOR'],
+            "matricula" : main['RESULTADO'][0]['MATRICULAS'][0]['X_MATRICULA'],
+            "centro" : main['RESULTADO'][0]['MATRICULAS'][0]['X_CENTRO'],
+            "tipo": main['RESULTADO'][0]["C_PERFIL"],
         }
+    elif(main['RESULTADO'][0]["C_PERFIL"] == "TUT_LEGAL"):
+        # Usuario es padre
+        return "TUT_LEGAL"
+    foto_local = getpic(user["matricula"])
+    
+    user.update( {"foto" : foto_local} ) # Agregar foto al dict user
+    return user
+def getpic(matricula):
     try:
         foto_local = open(common.config_path + "imagen.png", 'rb')
         print("Imagen encontrada")
@@ -119,10 +130,8 @@ def userinfo():
         foto_local = open(common.config_path + "imagen.png", 'wb')
         foto_req.raw.decode_content = True
         shutil.copyfileobj(foto_req.raw, foto_local)
-    
-    user.update( {"foto" : foto_local} ) # Agregar foto al dict user
-    return user
-
+    finally:
+        return foto_local
 def convcentro(evaluacion):
     bodyconv = "X_MATRICULA=" + user["matricula"]
     convocatorias = req("POST", base_url + "getConvocatorias", bodyconv)
