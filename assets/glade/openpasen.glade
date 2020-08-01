@@ -59,7 +59,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">OpenPasen</property>
-    <property name="version">1.4</property>
+    <property name="version">1.4.2</property>
     <property name="comments" translatable="yes">Cliente open-source hecho en Python del programa de seguimiento escolar de la Junta de Andalucía.</property>
     <property name="website">https://github.com/pablouser1/OpenPasen</property>
     <property name="logo_icon_name">image-missing</property>

@@ -31,7 +31,7 @@ elif system() == 'Linux':
 setup(
     name='OpenPasen',
     author='Pablo Ferreiro Romero',
-    version='1.4.1',
+    version='1.4.2',
     description='Programa de seguimiento escolar de la Junta de Andalucía no oficial',
     options={
         'build_exe': build_exe_options
