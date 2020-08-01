@@ -35,10 +35,16 @@ class Handler:
         api.login(logininfo)
         global user
         user = api.userinfo()
-        builder.get_object("bienvenido_img").set_from_file(f'{common.config_path}imagen.png') # Perfil usuario
-        builder.get_object("login_menu").hide()
-        builder.get_object("main_menu").show()
+        if (user == "TUT_LEGAL"):
+            builder.get_object("parents_menu").show()
+        else:
+            builder.get_object("bienvenido_img").set_from_file(f'{common.config_path}imagen.png') # Perfil usuario
+            builder.get_object("login_menu").hide()
+            builder.get_object("main_menu").show()
     
+    # -- Tutor legal menu -- #
+    def on_tutorlegal_menu_show(self, *args):
+        builder.get_object("tutorlegal_label").set_text(f'Bienvenido, {user["nombre"]}')
     # -- Main menu -- #
     def on_main_menu_show(self, *args):
         builder.get_object("bienvenido_label").set_text(f'Bienvenido, {user["nombre"]}')

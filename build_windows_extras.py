@@ -1,4 +1,4 @@
-# Lista de  recursos necesarios para poder crear el exe de Windows
+# Lista de recursos para poder crear el exe de Windows (algunos sobran)
 include_files = [
     # Assets
     'assets',

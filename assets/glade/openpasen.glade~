@@ -24,6 +24,36 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   <!-- interface-license-type gplv3 -->
   <!-- interface-name OpenPasen -->
   <!-- interface-description Programa Open source de seguimiento escolar de la Junta de Andaluc\303\255a -->
+  <object class="GtkAboutDialog">
+    <property name="can_focus">False</property>
+    <property name="type_hint">dialog</property>
+    <property name="program_name">Glade</property>
+    <property name="logo_icon_name">image-missing</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+  </object>
   <object class="GtkAboutDialog" id="about">
     <property name="can_focus">False</property>
     <property name="destroy_with_parent">True</property>
@@ -421,6 +451,8 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
       <!-- column-name Asignatura -->
       <column type="gchararray"/>
       <!-- column-name Mensaje -->
+      <column type="gchararray"/>
+      <!-- column-name Fecha -->
       <column type="gchararray"/>
     </columns>
   </object>
@@ -993,6 +1025,37 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
             <property name="fill">True</property>
             <property name="position">3</property>
           </packing>
+        </child>
+      </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+  </object>
+  <object class="GtkWindow" id="tutorlegal_menu">
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">tutorlegal_label</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
         </child>
       </object>
     </child>
