@@ -24,42 +24,12 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   <!-- interface-license-type gplv3 -->
   <!-- interface-name OpenPasen -->
   <!-- interface-description Programa Open source de seguimiento escolar de la Junta de Andaluc\303\255a -->
-  <object class="GtkAboutDialog">
-    <property name="can_focus">False</property>
-    <property name="type_hint">dialog</property>
-    <property name="program_name">Glade</property>
-    <property name="logo_icon_name">image-missing</property>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
-  </object>
   <object class="GtkAboutDialog" id="about">
     <property name="can_focus">False</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="program_name">OpenPasen</property>
-    <property name="version">1.4</property>
+    <property name="version">1.4.2</property>
     <property name="comments" translatable="yes">Cliente open-source hecho en Python del programa de seguimiento escolar de la Junta de Andalucía.</property>
     <property name="website">https://github.com/pablouser1/OpenPasen</property>
     <property name="logo_icon_name">image-missing</property>
@@ -100,6 +70,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   </object>
   <object class="GtkWindow" id="act_eval_menu">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Actividades Evaluables</property>
     <property name="destroy_with_parent">True</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
@@ -144,41 +115,38 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
       <placeholder/>
     </child>
   </object>
+  <object class="GtkListStore" id="centro_store">
+    <columns>
+      <!-- column-name Seccion -->
+      <column type="gchararray"/>
+      <!-- column-name Datos -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkWindow" id="centro_menu">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Centro</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
-      <object class="GtkGrid">
+      <object class="GtkTreeView" id="centro_treeview">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
+        <property name="can_focus">True</property>
+        <property name="model">centro_store</property>
+        <property name="enable_grid_lines">horizontal</property>
+        <child internal-child="selection">
+          <object class="GtkTreeSelection"/>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
+  </object>
+  <object class="GtkWindow" id="comunicaciones_menu">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Comunicaciones</property>
+    <child>
+      <placeholder/>
     </child>
     <child type="titlebar">
       <placeholder/>
@@ -235,11 +203,12 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="cerrarsesion">
+      <object class="GtkMenuItem" id="comunicaciones">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="label" translatable="yes">Cerrar sesión</property>
-        <signal name="activate" handler="on_cerrarsesion_activate" swapped="no"/>
+        <property name="label" translatable="yes">Comunicaciones</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_comunicaciones_activate" swapped="no"/>
       </object>
     </child>
     <child>
@@ -258,9 +227,26 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
       </object>
     </child>
     <child>
+      <object class="GtkMenuItem" id="horario_gen">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Generar horario</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_horario_gen_activate" swapped="no"/>
+      </object>
+    </child>
+    <child>
       <object class="GtkSeparatorMenuItem">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="cerrarsesion">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Cerrar sesión</property>
+        <signal name="activate" handler="on_cerrarsesion_activate" swapped="no"/>
       </object>
     </child>
     <child>
@@ -385,6 +371,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   </object>
   <object class="GtkWindow" id="notas_menu">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Notas</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
       <placeholder/>
@@ -403,6 +390,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   </object>
   <object class="GtkWindow" id="notas_evaluacion_menu">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Notas</property>
     <property name="destroy_with_parent">True</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
@@ -788,26 +776,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
                 <property name="tab_fill">False</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkLabel" id="avisos_label">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="position">6</property>
-              </packing>
-            </child>
-            <child type="tab">
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Avisos</property>
-              </object>
-              <packing>
-                <property name="position">6</property>
-                <property name="tab_fill">False</property>
-              </packing>
-            </child>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -815,6 +783,20 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
             <property name="padding">5</property>
             <property name="position">1</property>
           </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="general_label">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
         </child>
       </object>
     </child>
@@ -864,6 +846,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   </object>
   <object class="GtkWindow" id="perfil_menu">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Tu perfil</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
       <object class="GtkGrid">
@@ -963,6 +946,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   </object>
   <object class="GtkWindow" id="reporte_menu">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Reporte</property>
     <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
       <object class="GtkBox">
@@ -1034,16 +1018,16 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   </object>
   <object class="GtkWindow" id="tutorlegal_menu">
     <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Tutor legal</property>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkLabel">
+          <object class="GtkLabel" id="tutorlegal_label">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">tutorlegal_label</property>
           </object>
           <packing>
             <property name="expand">False</property>
