@@ -21,7 +21,7 @@ def init():
 def rand_web_color_hex():
     rgb = ""
     for _ in "RGB":
-        i = random.randrange(0, 2**8)
+        i = random.randrange(96, 2**8)
         rgb += i.to_bytes(1, "big").hex()
     return rgb
 
@@ -37,11 +37,23 @@ def generar(nombre, curso):
     ws = wb.active
     # Conseguir horario de la API
     horario = api.horario()
+    asignaturas = {}
     for col, dia in zip(ws.iter_cols(min_row=2, max_row=7, min_col=2, max_col=6), horario):
         for cell in col:
-            randomcolor = rand_web_color_hex()
-            cell.value = horario[dia][col.index(cell)]
-            cell.fill = PatternFill(start_color=randomcolor, fill_type = "solid")
+            asignatura = horario[dia][col.index(cell)]
+            cell.value = asignatura
+
+            # Color celda
+            # Si ya hay un color asignado a la asignatura, usarlo
+            if asignatura in asignaturas:
+                color = asignaturas[asignatura]
+            # Si no hay un color asignado elige un color al azar
+            else:
+                color = rand_web_color_hex()
+                asignaturas[asignatura] = color
+            
+            # Rellenar celda con color
+            cell.fill = PatternFill(start_color=color, fill_type = "solid")
     
     # Crear row con separación de recreo
 

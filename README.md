@@ -4,9 +4,9 @@ Esta es una implementación open-source distribuida bajo la licencia GPLv3 del p
 
 ![MainMenu](examples/mainmenu.png)
 
-Este programa puede generar reportes, [aquí](https://htmlpreview.github.io/?https://github.com/pablouser1/OpenPasen/blob/master/examples/reporte/reporte_example.html) puedes ver un ejemplo
+Este programa puede generar reportes, [aquí](https://htmlpreview.github.io/?https://github.com/pablouser1/OpenPasen/blob/master/examples/reporte/reporte_example.html) puedes ver un ejemplo.
 
-Actualmente testeado usando una cuenta de PASEN de alumno usando Linux, de momento no funciona con las cuentas de profesores y padres.
+Actualmente testeado usando una cuenta de PASEN de alumno usando Linux, de momento no funciona con cuentas de padres.
 
 # Cómo usar
 
@@ -24,7 +24,9 @@ WIP
 
 Necesitas instalar las dependencias: Python 3, Glade, y las librerías requests, configparser y GTK 3.
 
-Opcionalmente requiere BeautifulSoup para generar los reportes. Cuando tengas las dependencias puedes empezar ejecutando el archivo "openpython.py".
+Opcionalmente requiere BeautifulSoup para generar los reportes y openpyxl para generar los horarios fotocopiables.
+
+Cuando tengas las dependencias puedes empezar ejecutando el script "run.sh".
 
 # TODO
 
