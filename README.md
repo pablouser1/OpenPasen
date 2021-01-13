@@ -14,7 +14,7 @@ Actualmente testeado usando una cuenta de PASEN de alumno usando Linux, de momen
 
 Puedes encontrar el instalador en la sección de "releases" o en scripts/Output/openpasen_win64.exe.
 
-También puedes instalar python junto con las librerías necesarias y ejecutar el archivo "openpython.py". Este proceso es algo más complicado.
+También puedes instalar python junto con las librerías necesarias y ejecutar el módulo openpasen.
 
 #### Mac:
 
@@ -38,25 +38,9 @@ https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/avisos (Avisos) | GET (
 
 https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/getConductasContrarias (Conductas contrarias) | POST (Incompleta)
 
+Tutores legales
+
 Bug: Al generar más de un informe en una sesión comienza a duplicar entradas
-
-Optimización
-
-Mejorar diseño
-
-Limpieza de código
-
-#### Windows:
-
-Mejorar tamaño (librerías de sobra)
-
-Bug, Imagen del usuario de 0 bytes
-
-Problema con caracteres UTF-8 como ñ, á...
-
-#### Mac:
-
-Problema con caracteres UTF-8 (usa ASCII por defecto??) no arranca
 
 # Cómo contribuir
 

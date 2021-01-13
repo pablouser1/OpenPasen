@@ -19,6 +19,8 @@ def req(method, url, body = None):
             data = requests.get(url, headers=headers, cookies=jar, data=body, timeout=5, verify="cert/juntadeandalucia-es-chain.pem")
         if (method == "POST"):
             data = requests.post(url, headers=headerspost, cookies=jar, data=body, timeout=5, verify="cert/juntadeandalucia-es-chain.pem")
+        # El encoding del servidor es ISO-8859-1
+        data.encoding = 'ISO-8859-1'
         # Si el servidor devuelve un error hacer una exception
         if (data.json()['ESTADO']['CODIGO'] == "E"):
             raise Exception(data.json()['ESTADO']['DESCRIPCION'])
@@ -31,11 +33,13 @@ def req(method, url, body = None):
 
 # Initial variables
 headers = {
-    "Content-Type": "application/json; charset=UTF-8"
+    "Content-Type": "application/json",
+    "User-Agent": "OpenPasen"
 }
 
 headerspost = {
-    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    "Content-Type": "application/x-www-form-urlencoded",
+    "User-Agent": "OpenPasen"
 }
 
 base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/" # Este es el comienzo de todas las URLs de PASEN
@@ -43,7 +47,7 @@ base_url = "https://seneca.juntadeandalucia.es/seneca/jsp/pasendroid/" # Este es
 def login(logininfo):
     # (logininfo): 0 = Username | 1 = Password | 2 = Remember me
 
-    body = 'USUARIO=' + logininfo[0] + '&CLAVE=' + logininfo[1] + '&p={"version":"11.10.4"}'
+    body = 'USUARIO=' + logininfo[0] + '&CLAVE=' + logininfo[1] + '&p={"version":"11.10.5"}'
     login = req("POST", base_url + "login", body)
     # Comprobando si se ha iniciado sesión correctamente
     if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
@@ -53,7 +57,7 @@ def login(logininfo):
     jar.set('SenecaP', login.cookies['SenecaP'], domain='seneca.juntadeandalucia.es', path='/')
     jar.set('JSESSIONID', login.cookies['JSESSIONID'], domain='seneca.juntadeandalucia.es', path='/')
     # Guardar configuración de inicio de sesión si se ha marcado el botón de mantener sesión iniciada
-    if (logininfo[2] == "True"):
+    if (logininfo[2] == True):
         print("Guardando información de inicio de sesión...")
         config['Cookies'] = {
             'SenecaP': login.cookies['SenecaP'],
@@ -75,10 +79,10 @@ def checksession():
         print("Sesión ok")
     except KeyError:
         print("Las cookies han expirado, generando nuevas...")
-        body = 'USUARIO=' + config['Login']['Username'] + '&CLAVE=' + config['Login']['Password'] + '&p={"version":"11.10.4"}'
+        body = 'USUARIO=' + config['Login']['Username'] + '&CLAVE=' + config['Login']['Password'] + '&p={"version":"11.10.5"}'
         login = req("POST", base_url + "login", body)
         if (login.text != '{"ESTADO":{"CODIGO":"C"}}'):
-            print("Error al iniciar sesión")
+            print(f'Error al iniciar sesión,\n{login.text}')
             quit(1)
         # Algo ha tenido que cambiar en los servidores de la Junta, de momento esto funciona
         try:

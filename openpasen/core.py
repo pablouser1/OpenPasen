@@ -86,7 +86,7 @@ class Handler:
         convcentro = api.convcentro(notas_evaluacion)
         # Asignaturas_list tiene los nombres de las asignaturas mientras que notas_numero_list tiene la nota numérica.
         notas = api.getNotas(convcentro, notas_evaluacion)
-        # Si no hay notas disponibles, avisar y no continuar, ya que tendríamos una ZeroDivisionError
+        # Si no hay notas disponibles, avisar y no continuar, ya que tendríamos un ZeroDivisionError
         if (notas["notas_num"] == []):
             builder.get_object("notas_info").set_markup(f'{notas_evaluacion} no tiene notas disponibles')
         else:

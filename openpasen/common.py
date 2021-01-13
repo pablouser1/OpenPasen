@@ -12,15 +12,16 @@ def init():
     jar = requests.cookies.RequestsCookieJar()
     global config
     config = configparser.ConfigParser()
+    homepath = str(Path.home())
     global config_path
     if platform.system() in "Linux":
-        config_path = str(Path.home()) + "/.config/openpasen/" # Localización en linux
+        config_path = homepath + "/.config/openpasen/" # Localización en linux
     
     elif platform.system() in "Windows":
-        config_path = str(Path.home()) + "/AppData/Roaming/OpenPasen/" # Localización en Windows
+        config_path = homepath + "/AppData/Roaming/OpenPasen/" # Localización en Windows
     
     elif platform.system() in "Darwin":
-        config_path = str(Path.home()) + "/Library/OpenPasen" # Localización en Mac
+        config_path = homepath + "/Library/OpenPasen" # Localización en Mac
 
 def getsession():
     try:
