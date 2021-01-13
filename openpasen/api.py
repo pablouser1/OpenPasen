@@ -146,9 +146,9 @@ def getpic(matricula):
 def convcentro(evaluacion):
     bodyconv = "X_MATRICULA=" + user["matricula"]
     convocatorias = req("POST", base_url + "getConvocatorias", bodyconv)
-    for i in range(0, len(convocatorias.json()['RESULTADO'])):
-        if (convocatorias.json()['RESULTADO'][i]['D_CONVOCATORIA'] == evaluacion):
-            return convocatorias.json()['RESULTADO'][i]['X_CONVCENTRO']
+    for convocatoria in convocatorias.json()["RESULTADO"]:
+        if evaluacion in convocatoria['D_CONVOCATORIA']:
+            return convocatoria['X_CONVCENTRO']
 
 def getNotas(convcentro, notas_evaluacion):
     bodynotas = "X_MATRICULA=" + user["matricula"] + "&X_CONVCENTRO=" + str(convcentro)
@@ -157,9 +157,9 @@ def getNotas(convcentro, notas_evaluacion):
         "asignaturas": [],
         "notas_num": []
     }
-    for i in range(0,len(notas_req['RESULTADO'])):
-        notas["asignaturas"].append(notas_req['RESULTADO'][i]['D_MATERIA'])
-        notas["notas_num"].append(notas_req['RESULTADO'][i]['NOTA'])
+    for nota in notas_req["RESULTADO"]:
+        notas["asignaturas"].append(nota["D_MATERIA"])
+        notas["notas_num"].append(nota["NOTA"])
     
     return notas
 
@@ -167,8 +167,8 @@ def getMateriasMatricula():
     bodymaterias = "X_MATRICULA=" + user["matricula"]
     matmatricula = req("POST", base_url + "getMateriasMatricula", bodymaterias)
     materias = []
-    for i in range (0, len(matmatricula.json()['RESULTADO'])):
-        materias.append(matmatricula.json()['RESULTADO'][i]['D_MATERIAC'])
+    for materia in matmatricula.json()['RESULTADO']:
+        materias.append(materia['D_MATERIAC'])
     return materias
 
 def actividadesevaluables(convcentro, asignatura):
@@ -179,13 +179,13 @@ def actividadesevaluables(convcentro, asignatura):
         "tema": [],
         "nota": []
     }
-    for i in range(0,len(acteval_req['RESULTADO'])):
+    for actividad in acteval_req['RESULTADO']:
         if (asignatura == "Todas"):
-            acteval["tema"].append(acteval_req['RESULTADO'][i]['D_ACTEVA'])
-            acteval["nota"].append(acteval_req['RESULTADO'][i]['N_NOTA'])
-        elif (acteval_req['RESULTADO'][i]['D_MATERIAC'] == asignatura):
-            acteval["tema"].append(acteval_req['RESULTADO'][i]['D_ACTEVA'])
-            acteval["nota"].append(acteval_req['RESULTADO'][i]['N_NOTA'])
+            acteval["tema"].append(actividad['D_ACTEVA'])
+            acteval["nota"].append(actividad['N_NOTA'])
+        elif (actividad['D_MATERIAC'] == asignatura):
+            acteval["tema"].append(actividad['D_ACTEVA'])
+            acteval["nota"].append(actividad['N_NOTA'])
 
     return acteval
 
@@ -211,10 +211,10 @@ def observaciones():
         "Mensajes": [],
         "Fechas": []
     }
-    for i in range(0,len(observaciones.json()['RESULTADO'])):
-        observaciones_dict["Asignaturas"].append(observaciones.json()['RESULTADO'][i]['D_MATERIAC'])
-        observaciones_dict["Mensajes"].append(observaciones.json()['RESULTADO'][i]['T_OBSMATERIA'])
-        observaciones_dict["Fechas"].append(observaciones.json()['RESULTADO'][i]['F_OBSMAT'])
+    for observacion in observaciones.json()['RESULTADO']:
+        observaciones_dict["Asignaturas"].append(observacion['D_MATERIAC'])
+        observaciones_dict["Mensajes"].append(observacion['T_OBSMATERIA'])
+        observaciones_dict["Fechas"].append(observacion['F_OBSMAT'])
     return observaciones_dict
 
 def horario():
@@ -227,11 +227,11 @@ def horario():
         "Jueves": [],
         "Viernes": [],
     }
-    for i in range(0, len(horario.json()['RESULTADO'])):
-        # Elimina todo lo que va después del paréntesis (para que quepa en la tabla)
-        temp = horario.json()['RESULTADO'][i]['PROF'].split("(", 1)[0]
+    for hora in horario.json()["RESULTADO"]:
+        # Elimina todo lo que va después del paréntesis
+        temp = hora['PROF'].split("(", 1)[0]
         final = temp.strip()
-        dia = horario.json()['RESULTADO'][i]['DIA']
+        dia = hora['DIA']
         horario_dict[dia].append(final)
     
     return horario_dict
@@ -244,10 +244,10 @@ def faltas():
         "Fechas y Horas": [],
         "Justificada": []
     }
-    for i in range(0, len(faltas_req.json()['RESULTADO'])):
-        faltas["Asignaturas"].append(faltas_req.json()['RESULTADO'][i]['D_MATERIAC'])
-        faltas["Fechas y Horas"].append(f'{faltas_req.json()["RESULTADO"][i]["F_FALASI"]}, {faltas_req.json()["RESULTADO"][i]["TRAMO"]}')
-        faltas["Justificada"].append(faltas_req.json()['RESULTADO'][i]['TIPFAL'])
+    for falta in faltas_req.json()['RESULTADO']:
+        faltas["Asignaturas"].append(falta['D_MATERIAC'])
+        faltas["Fechas y Horas"].append(f'{falta["F_FALASI"]}, {falta["TRAMO"]}')
+        faltas["Justificada"].append(falta['TIPFAL']) 
 
     return faltas
 
