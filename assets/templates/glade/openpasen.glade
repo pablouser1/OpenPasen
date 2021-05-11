@@ -20,7 +20,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <interface>
-  <requires lib="gtk+" version="3.22"/>
+  <requires lib="gtk+" version="3.24"/>
   <!-- interface-license-type gplv3 -->
   <!-- interface-name OpenPasen -->
   <!-- interface-description Programa Open source de seguimiento escolar de la Junta de Andaluc\303\255a -->
@@ -64,20 +64,43 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkWindow" id="act_eval_menu">
+  <object class="GtkWindow" id="actividades_menu">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Actividades Evaluables</property>
-    <property name="destroy-with-parent">True</property>
+    <signal name="delete-event" handler="deleteEvent" swapped="no"/>
     <child>
-      <object class="GtkBox" id="actividades_box">
+      <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">10</property>
         <child>
-          <object class="GtkLabel" id="actividades_label">
+          <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <child>
+              <object class="GtkComboBoxText" id="actividades_asignaturas_dropdown">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <signal name="changed" handler="on_actividades_dropdown_changed" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkComboBoxText" id="actividades_evaluaciones_dropdown">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <signal name="changed" handler="on_actividades_dropdown_changed" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -90,7 +113,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="model">actividades_store</property>
-            <property name="search-column">0</property>
             <child internal-child="selection">
               <object class="GtkTreeSelection"/>
             </child>
@@ -100,9 +122,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
             <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
@@ -294,9 +313,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
           </packing>
         </child>
         <child>
-          <placeholder/>
-        </child>
-        <child>
           <!-- n-columns=2 n-rows=3 -->
           <object class="GtkGrid">
             <property name="visible">True</property>
@@ -315,11 +331,12 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="act_eval">
+              <object class="GtkButton" id="actividades">
                 <property name="label" translatable="yes">Actividades evaluables</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <signal name="clicked" handler="on_actividades_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -433,6 +450,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="input-purpose">name</property>
+            <property name="show-emoji-icon">True</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -515,17 +533,18 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
+        <property name="spacing">5</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <child>
-              <object class="GtkLabel" id="notas_evaluacion">
+              <object class="GtkLabel" id="notas_media">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
@@ -563,17 +582,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
             <property name="fill">True</property>
             <property name="padding">5</property>
             <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="notas_media">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
           </packing>
         </child>
       </object>

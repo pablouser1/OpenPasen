@@ -13,7 +13,7 @@ class PasenAPI:
     def infoSesion():
         res = sendReq("/infoSesion", "GET")
         return res
-    
+
     # Photo
     @staticmethod
     def photo(matricula):
@@ -23,7 +23,7 @@ class PasenAPI:
             "ANCHO": 128
         }, "photo")
         return res
-    
+
     # Convocatorias
     @staticmethod
     def convocatorias(matricula):
@@ -40,6 +40,23 @@ class PasenAPI:
                 })
             return convocatorias
         return []
+
+    # Asignaturas
+    @staticmethod
+    def asignaturas(matricula):
+        asignaturas = []
+        res = sendReq("/getMateriasMatricula", "POST", {
+            "X_MATRICULA": matricula
+        })
+        if res:
+            for asignatura in res["RESULTADO"]:
+                asignaturas.append({
+                    "id": asignatura["X_MATERIAOMG"],
+                    "name": asignatura["D_MATERIAC"]
+                })
+            return asignaturas
+        return []
+
     # Notas
     @staticmethod
     def notas(matricula, convcentro):
@@ -56,3 +73,41 @@ class PasenAPI:
                 })
             return notas
         return []
+    # Actividades evaluables
+    @staticmethod
+    def actividades(matricula, convcentro, asignatura = None):
+        actividades = []
+        data = {
+            "X_MATRICULA": matricula,
+            "X_CONVCENTRO": convcentro
+        }
+        if asignatura:
+            data["X_MATERIAOMG"] = asignatura
+
+        res = sendReq("/getActividadesEvaluables", "POST", data)
+        if res:
+            for actividad in res["RESULTADO"]:
+                actividades.append({
+                    "id": actividad["X_ACTEVA"],
+                    "nombre": actividad["D_ACTEVA"],
+                    "nota": actividad["N_NOTA"]
+                })
+            return actividades
+        return []
+    # Centro
+    @staticmethod
+    def centro(xcentro):
+        res = sendReq("/datosCentro", "POST", {
+            "X_CENTRO": xcentro
+        })
+        if res:
+            return res["RESULTADO"]
+        return res
+
+    # Horario
+    @staticmethod
+    def horario(matricula):
+        res = sendReq("/getHorario", "POST", {
+            "X_MATRICULA": matricula
+        })
+        return res

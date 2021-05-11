@@ -9,7 +9,7 @@ class App:
     builder = Gtk.Builder()
 
     def start(self):
-        print("Inciando GUI")
+        print("Inciando OpenPasen...")
         first_menu = "login_menu"
         creds = config.getConfig("Login")
         if creds:
