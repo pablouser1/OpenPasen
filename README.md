@@ -1,6 +1,6 @@
 # OpenPasen
 
-### <span style="background-color:red;">AVISO</span>
+### --> AVISO <--
 La versión estable y usable está [aquí](https://github.com/pablouser1/OpenPasen/tree/legacy)
 
 Esta versión está todavía en desarrollo.
