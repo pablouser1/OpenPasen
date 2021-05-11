@@ -1,5 +1,5 @@
-from openpasen.api.auth import Auth
-from openpasen.api.user import UserAPI
+from gi.repository import Gtk
+from openpasen.api.user import PasenAPI
 from openpasen.common import user, config
 
 class GuiSignals:
@@ -20,7 +20,7 @@ class GuiSignals:
         password = self.builder.get_object("password").get_text()
         remember = self.builder.get_object('sesioniniciada').get_active()
 
-        res = Auth.login(username, password)
+        res = PasenAPI.login(username, password)
         if res:
             if remember:
                 config.saveLogin(username, password)
@@ -58,40 +58,37 @@ class GuiSignals:
         pass
 
     # Notas
-    def on_continuar_notas_boton_clicked(self, button):
-        """
+    def on_notas_clicked(self, button):
         # Por algún motivo, esto es necesario para que al cerrar y volver a abrir se pueda ver el treeview
-        notas_menu = self.builder.get_object("notas_evaluacion_menu")
-        notas_box = self.builder.get_object("notas_box")
-        notas_box.get_parent().remove(notas_box)
-        notas_menu.add(notas_box)
+        notas_menu = self.builder.get_object("notas_menu")
+        dropdown = self.builder.get_object("notas_dropdown")
+        convcentro = PasenAPI.convocatorias(user.id)
 
-        notas_evaluacion = self.builder.get_object("notascombo").get_active_text()
-        convcentro = api.convcentro(notas_evaluacion)
-        # Asignaturas_list tiene los nombres de las asignaturas mientras que notas_numero_list tiene la nota numérica.
-        notas = api.getNotas(convcentro, notas_evaluacion)
-        # Si no hay notas disponibles, avisar y no continuar, ya que tendríamos un ZeroDivisionError
-        if (notas["notas_num"] == []):
-            self.builder.get_object("notas_info").set_markup(f'{notas_evaluacion} no tiene notas disponibles')
-        else:
-            tree = self.builder.get_object("notas_treeview")
-            store = self.builder.get_object("notas_store")
-            store.clear()
-            for i in range(0, len(notas["asignaturas"])):
-                store.append([notas["asignaturas"][i], notas["notas_num"][i]])
-            # Crear columnas si no existen
-            if not tree.get_columns():
+        dropdown.remove_all()
+        for conv in convcentro:
+            dropdown.append(str(conv["id"]), conv["name"])
+
+        notas_menu.show()
+    
+    def on_notas_dropdown_changed(self, dropdown):
+        notas_treeview = self.builder.get_object("notas_treeview")
+        store = self.builder.get_object("notas_store")
+        conv = dropdown.get_active_id()
+        notas = PasenAPI.notas(user.id, conv)
+        store.clear()
+        if notas:
+            total = 0
+            for nota in notas:
+                total += int(nota["nota"])
+                store.append([nota["nombre"], nota["nota"]])
+            media = total / len(notas)
+            self.builder.get_object("notas_media").set_text(f'Tu nota media es de: {str(media)}')
+            if not notas_treeview.get_columns():
                 columns = ["Asignatura", "Nota"]
                 cell = Gtk.CellRendererText()
                 for i, column in enumerate(columns):
                     col = Gtk.TreeViewColumn(column, cell, text=i)
-                    tree.append_column(col)
-            # Nota media
-            media_final = sum(int (i) for i in notas["notas_num"]) / len(notas["notas_num"])
-            self.builder.get_object("notas_media").set_markup(f'Tu nota media es de {str(round(media_final, 2))}')
-            notas_menu.show()
-            """
-        pass
+                    notas_treeview.append_column(col)
     def on_actividades_continuar_clicked(self, button):
         """
         # TODO, optimizar

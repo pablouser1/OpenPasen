@@ -1,4 +1,4 @@
-from openpasen.api.user import UserAPI
+from openpasen.api.user import PasenAPI
 class User:
     def __init__(self):
         self.id = 0,
@@ -13,7 +13,7 @@ class User:
         self.tipo = ""
         self.foto = None
     def getUser(self):
-        res = UserAPI.infoSesion()
+        res = PasenAPI.infoSesion()
         if res:
             user = res["RESULTADO"][0]
             matricula = user["MATRICULAS"][0]
@@ -28,7 +28,7 @@ class User:
             }
             self.tipo = user["C_PERFIL"]
             # Foto
-            self.foto = UserAPI.photo(self.id)
+            self.foto = PasenAPI.photo(self.id)
 
 
             return True

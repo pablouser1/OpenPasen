@@ -1,9 +1,9 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from openpasen.common import user
+from openpasen.api.user import PasenAPI
+from openpasen.common import user, config
 from openpasen.gui.signals import GuiSignals
-from openpasen.api.auth import Auth
 
 class App:
     builder = Gtk.Builder()
@@ -11,8 +11,9 @@ class App:
     def start(self):
         print("Inciando GUI")
         first_menu = "login_menu"
-        loggedIn = Auth.checkSession()
-        if loggedIn:
+        creds = config.getConfig("Login")
+        if creds:
+            PasenAPI.login(creds["username"], creds["password"])
             user.getUser()
             first_menu = "main_menu"
         self.builder.add_from_file("assets/templates/glade/openpasen.glade")
