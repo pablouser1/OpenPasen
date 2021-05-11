@@ -34,7 +34,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
     <property name="website">https://github.com/pablouser1/OpenPasen</property>
     <property name="logo-icon-name">image-missing</property>
     <property name="license-type">gpl-3-0</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can-focus">False</property>
@@ -69,7 +68,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Actividades Evaluables</property>
     <property name="destroy-with-parent">True</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
       <object class="GtkBox" id="actividades_box">
         <property name="visible">True</property>
@@ -120,7 +118,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   <object class="GtkWindow" id="centro_menu">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Centro</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
       <object class="GtkTreeView" id="centro_treeview">
         <property name="visible">True</property>
@@ -357,7 +354,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   <object class="GtkWindow" id="notas_menu">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Notas</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
       <placeholder/>
     </child>
@@ -374,7 +370,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Notas</property>
     <property name="destroy-with-parent">True</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
       <object class="GtkBox" id="notas_box">
         <property name="visible">True</property>
@@ -505,7 +500,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">10</property>
-                <signal name="delete-event" handler="delete_event" swapped="no"/>
                 <child>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
@@ -524,7 +518,7 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
                     <property name="can-focus">False</property>
                     <property name="active">0</property>
                     <items>
-                      <item id="0">1º Evaluación</item>
+                      <item id="0">1ª Evaluación</item>
                       <item id="1">2ª Evaluación</item>
                       <item id="2">3ª Evaluación</item>
                       <item id="3" translatable="yes">Ordinaria</item>
@@ -848,7 +842,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   <object class="GtkWindow" id="perfil_menu">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Tu perfil</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
       <!-- n-columns=3 n-rows=4 -->
       <object class="GtkGrid">
@@ -958,7 +951,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
   <object class="GtkWindow" id="reporte_menu">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Reporte</property>
-    <signal name="delete-event" handler="delete_event" swapped="no"/>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
@@ -1020,34 +1012,6 @@ along with OpenPasen.  If not, see <http://www.gnu.org/licenses/>.
             <property name="fill">True</property>
             <property name="position">3</property>
           </packing>
-        </child>
-      </object>
-    </child>
-  </object>
-  <object class="GtkWindow" id="tutorlegal_menu">
-    <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Tutor legal</property>
-    <child>
-      <object class="GtkBox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="orientation">vertical</property>
-        <child>
-          <object class="GtkLabel" id="tutorlegal_label">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
