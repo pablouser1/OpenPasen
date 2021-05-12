@@ -107,7 +107,22 @@ class PasenAPI:
     # Horario
     @staticmethod
     def horario(matricula):
+        horario = {
+            "Lunes": [],
+            "Martes": [],
+            "Miercoles": [],
+            "Jueves": [],
+            "Viernes": []
+        }
         res = sendReq("/getHorario", "POST", {
             "X_MATRICULA": matricula
         })
-        return res
+        if res:
+            for asignatura in res["RESULTADO"]:
+                nombre_y_profesor = asignatura["PROF"]
+                dia = horario[asignatura["DIA"]]
+                dia.append({
+                    "nombre": nombre_y_profesor.split("(")[0].strip(),
+                    "profesor": nombre_y_profesor[nombre_y_profesor.find("(")+1:nombre_y_profesor.find(")")]
+                })
+        return horario

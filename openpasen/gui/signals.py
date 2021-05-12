@@ -124,6 +124,30 @@ class GuiSignals:
                 for actividad in actividades:
                     store.append([actividad["nombre"], actividad["nota"]])
 
+    def on_horario_clicked(self, button):
+        treeview = self.builder.get_object("horario_treeview")
+        horario_menu = self.builder.get_object("horario_menu")
+        store = self.builder.get_object("horario_store")
+        store.clear()
+        horario = PasenAPI.horario(user.id)
+        for i in range(0, 6):
+            store.append(
+                [
+                    horario["Lunes"][i]["nombre"],
+                    horario["Martes"][i]["nombre"],
+                    horario["Miercoles"][i]["nombre"],
+                    horario["Jueves"][i]["nombre"],
+                    horario["Viernes"][i]["nombre"]
+                ]
+            )
+
+        if not treeview.get_columns():
+            columns = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
+            cell = Gtk.CellRendererText()
+            for i, column in enumerate(columns):
+                col = Gtk.TreeViewColumn(column, cell, text=i)
+                treeview.append_column(col)
+        horario_menu.show()
     # -- Header menú principal -- #
     # Acerca de
     def on_acercade_activate(self, button):
@@ -145,7 +169,7 @@ class GuiSignals:
 
     # -- Comunicaciones -- #
     def on_comunicaciones_activate(self, button):
-        pass
+        print("WIP")
 
     def on_reporte_activate(self, button):
         self.builder.get_object("reporte_menu").show()
