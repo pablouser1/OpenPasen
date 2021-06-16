@@ -16,7 +16,7 @@ Necesitas instalar las dependencias: Python 3, Glade, y las librerías requests,
 Cuando tengas las dependencias puedes empezar ejecutando el script "run.sh".
 
 ## Cómo contribuir
-Este programa utiliza la API de iPASEN, las solicitudes al servidor necesarias se pueden obtener a través de logcat. Cualquiera contribución es bienvenida.
+Este programa utiliza la API de iPASEN, las solicitudes al servidor necesarias se pueden obtener a través de logcat. Cualquier contribución es bienvenida.
 
 ## Legacy
 Existe una versión antigua con más funciones que esta, pero más inestable y con código más caótico.
